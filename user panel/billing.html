@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Billing - Order Payment</title>
+  <style>
+    :root{
+        --bg:#fff4f6;
+        --accent :#ff6600;
+        --muted:#666
+    }
+    html,body{
+        height:100%;
+        margin:0;
+         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+   
+        
+    }
+    body{
+        font-family:Arial,Helvetica,sans-serif;
+        background:var(--bg);
+        color:#222
+    }
+
+    /* full viewport layout */
+    .page{
+        min-height:100vh;
+        display:flex;
+        flex-direction:column
+    }
+    .header{
+        padding:20px 28px; 
+        border-bottom:1px solid #f2e6ea;
+        background:#ffa76c7c;
+    }
+    /* brand corner label */
+    .page { position: relative; }
+    .brand-corner{
+      position: absolute;
+      right: 28px; /* align with header horizontal padding */
+      top: 20px;   /* align with header vertical padding */
+      
+      color: var(--accent);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight:700;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      z-index: 50;
+      font-size:0.9rem;
+    }
+    .header h1{
+        margin:0;
+        color:var(--accent);
+        font-size:1.4rem
+    }
+    .meta{
+        margin-top:6px;
+        color:var(--muted);
+        font-size:0.95rem
+    }
+
+  .content{
+    flex:1;
+    display:block;
+    padding:12px 20px;
+    overflow:hidden
+}
+  .items-panel{
+    width:100%;
+    background:#fff;
+    border-radius:12px;
+    /* add extra left padding so images aren't flush to the edge */
+    padding:12px 14px 12px 28px;
+    overflow:auto;
+    box-shadow:0 6px 20px rgba(0,0,0,0.04)
+}
+  table{
+    width:100%;
+    border-collapse:collapse
+}
+    th,td{
+        padding:10px;
+        border-bottom:1px solid #f6e8ec;
+        text-align:left}
+    .item-name{
+        font-weight:600
+    }
+  .item-thumb{
+    width:56px;
+    height:44px;
+    object-fit:cover;
+    border-radius:8px;
+    margin-right:10px;
+    display:inline-block;
+    vertical-align:middle;
+  }
+  /* ensure first table cell keeps space from the very left edge */
+  .items-panel table td:first-child,
+  .items-panel table th:first-child {
+    padding-left:8px;
+  }
+  .item-cell{display:flex;align-items:center;gap:8px}
+    .line{
+        font-weight:600;
+        color:var(--accent)
+    }
+
+  /* summary moved into bottom action bar */
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    color:#666
+}
+  .summary-row.total{
+    font-size:1.15rem;
+    font-weight:700;
+    color:#222
+}
+
+    /* sticky bottom action bar */
+  .action-bar{
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(180deg,#ffffff00,#ffffff);
+    padding:14px 20px;
+    display:flex;
+    justify-content:center;
+    align-items:center
+}
+  .action-inner{
+    max-width:1180px;
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center
+}
+  .details{
+    display:flex;
+    flex-direction:column;
+    gap:6px
+}
+  .details div{
+    font-size:0.95rem;
+    color:#666
+}
+  .pay-btn{
+    background:var(--accent);
+    color:#fff;
+    padding:12px 18px;
+    border:none;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer
+}
+  .back-btn{
+    background:transparent;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer
+}
+
+    @media (max-width:900px){
+      .content{padding:10px}
+      .action-inner{flex-direction:column;align-items:stretch}
+    }
+    /* responsive tweaks for brand label */
+    @media (max-width:900px) {
+      .brand-corner{ right: 20px; top: 16px; font-size:0.85rem; padding:5px 8px; }
+    }
+    @media (max-width:480px) {
+      /* move label inside header space on very small screens */
+      .brand-corner{ right: 16px; top: 12px; font-size:0.8rem; padding:4px 7px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="brand-corner">SeffronSky</div>
+    <div class="header">
+      <h1>Order Billing</h1>
+      <div id="orderMeta" class="meta"></div>
+    </div>
+
+    <div class="content">
+      <div class="items-panel">
+        <table id="itemsTable">
+          <thead>
+            <tr><th>Item</th><th style="width:80px">Qty</th><th style="width:120px">Price</th><th style="width:120px">Line</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <div class="action-inner">
+        <div class="details">
+          <div>Subtotal: <strong id="subtotalCell">₹0.00</strong></div>
+          <div>Tax: <strong id="taxCell">₹0.00</strong></div>
+          <div>Charges: <strong id="chargesCell">₹0.00</strong></div>
+        </div>
+          <div style="display:flex;align-items:center;gap:18px">
+          <div style="text-align:right"><div style="font-size:0.9rem;color:#666">Total</div><div style="font-size:1.2rem;font-weight:800;color:var(--accent)" id="bottomTotal">₹0.00</div></div>
+          <button class="back-btn" id="addMoreBtn">Add more items</button>
+          <button class="pay-btn" id="payBtn">Pay Now</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="payMsg" style="margin:10px 28px 28px 28px;color:#2d3748"></div>
+  </div>
+
+  <script>
+    (function(){
+      const order = JSON.parse(localStorage.getItem('currentOrder') || 'null');
+      if (!order) {
+        alert('No order found. Redirecting to menu.');
+        window.location.href = 'Menu.html';
+        return;
+      }
+
+  // build metadata: order id, table, customer name/email (if present), created time
+  const metaParts = [];
+  metaParts.push(`Order: ${order.id}`);
+  if (order.tableNumber) metaParts.push(`Table: ${order.tableNumber}`);
+  if (order.user && order.user.name) metaParts.push(`Customer: ${order.user.name}`);
+  else if (order.user && order.user.email) metaParts.push(`Customer: ${order.user.email}`);
+  metaParts.push(`Created: ${new Date(order.createdAt).toLocaleString()}`);
+  document.getElementById('orderMeta').textContent = metaParts.join(' | ');
+
+      const tbody = document.querySelector('#itemsTable tbody');
+      order.items.forEach(it => {
+        const tr = document.createElement('tr');
+        const imgHtml = it.image ? `<img src="${it.image}" alt="${it.name}" class="item-thumb">` : '';
+        tr.innerHTML = `<td class="item-cell">${imgHtml}<span class="item-name">${it.name}</span></td><td>${it.qty}</td><td>₹${it.price.toFixed(2)}</td><td class="line">₹${(it.price*it.qty).toFixed(2)}</td>`;
+        tbody.appendChild(tr);
+      });
+
+  document.getElementById('subtotalCell').textContent = `₹${order.subtotal.toFixed(2)}`;
+  document.getElementById('taxCell').textContent = `₹${order.tax.toFixed(2)}`;
+  document.getElementById('chargesCell').textContent = `₹${order.charges.toFixed(2)}`;
+  document.getElementById('bottomTotal').textContent = `₹${order.total.toFixed(2)}`;
+
+      // Add-more button goes back to menu (keeps currentOrder)
+      document.getElementById('addMoreBtn')?.addEventListener('click', () => {
+        window.location.href = 'Menu.html';
+      });
+
+      document.getElementById('payBtn').addEventListener('click', () => {
+        const payMsg = document.getElementById('payMsg');
+        const payBtn = document.getElementById('payBtn');
+        payMsg.textContent = 'Processing payment...';
+        payBtn.disabled = true;
+        setTimeout(() => {
+          payMsg.textContent = 'Payment successful. Thank you!';
+          // mark order as paid in orders list
+          const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+          const idx = orders.findIndex(o => o.id === order.id);
+          if (idx !== -1) {
+            orders[idx].status = 'paid';
+            orders[idx].paidAt = new Date().toISOString();
+            localStorage.setItem('orders', JSON.stringify(orders));
+          }
+
+          // remove currentOrder and notify other pages by setting a timestamp flag
+          localStorage.removeItem('currentOrder');
+          try { localStorage.setItem('order_cleared_at', String(Date.now())); } catch (e) { /* ignore */ }
+
+          // Also cancel any active table booking associated with this order (same user email and tableNumber)
+          try {
+            if (order && order.user && order.user.email && order.tableNumber) {
+              const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+              const updated = allBookings.filter(b => !(b.email === order.user.email && String(b.tableNumber) === String(order.tableNumber)));
+              localStorage.setItem('bookings', JSON.stringify(updated));
+              try { localStorage.setItem('booking_cleared_at', String(Date.now())); } catch(e) {}
+            }
+          } catch (e) {
+            // ignore booking cleanup errors
+          }
+
+          // clear billing UI immediately
+          document.querySelector('#itemsTable tbody').innerHTML = '';
+          document.getElementById('subtotalCell').textContent = '₹0.00';
+          document.getElementById('taxCell').textContent = '₹0.00';
+          document.getElementById('chargesCell').textContent = '₹0.00';
+          document.getElementById('bottomTotal').textContent = '₹0.00';
+
+          // redirect: show Order.html for 5 seconds, then go to Menu
+          setTimeout(() => {
+            try {
+              window.location.href = 'Order.html';
+            } catch (e) {
+              // fallback
+              window.location.href = 'Menu.html';
+            }
+            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
+          }, 900);
+        }, 900);
+      });
+    })();
+  </script>
+</body>
+</html>

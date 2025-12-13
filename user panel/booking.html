@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table Booking</title>
+  <style>
+    body {
+      background:url('assets/food background.jpg') no-repeat center center/cover;
+      display: flex;
+      align-items: center; /* place content at top so page can scroll */
+      justify-content: center;
+      min-height: 100vh;
+      padding: 32px 16px; /* uniform outer spacing */
+      
+    }
+
+    .booking-container {
+      width: 900px;
+      max-width: 100%;
+      margin-top: 24px; /* spacing from top when page scrolls */
+      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.49);
+      border-radius: 15px;
+      padding: 24px;
+      text-align: center;
+      background: #ffa76c7c;
+      border: 4px solid #ff6600;
+      position: relative;
+    }
+    /* brand corner label */
+    .brand-corner{
+      position: absolute;
+      left: 20px;
+      top: 15px;
+      color: #ff6600;
+      padding: 6px 10px;
+      font:weight 700;
+      text-align: justify;
+      font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
+      
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #ff6600;
+    }
+
+    .booking-inner{
+      display:flex;
+      gap:20px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+
+    .booking-image-wrap{
+        flex:0 0 370px
+
+    }
+    .booking-image{
+        width:100%;
+        height:auto;
+        display:block;
+       
+        
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+       background: #ffa76c7c;
+       border-radius: 12px;
+       flex:1 1 auto;
+       padding:8px 0;
+       margin-right: -10px;
+    }
+
+    label {
+      font-size: 15px;
+      margin-top: 10px;
+      align-self: flex-start;
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    select, input {
+        align-items: center;
+      width: calc(100% - 50px);
+      max-width: 500px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ff6600;
+      outline: none;
+      margin: 8px auto;
+      font-size: 15px;
+    }
+
+    button {
+      width: calc(100% - 40px);
+      max-width: 520px;
+      padding: 12px;
+      background: #ff6600;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin: 12px 20px 8px 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e65c00;
+    }
+
+    .bookings-list {
+      margin-top: 25px;
+      text-align: left;
+    }
+
+    .booking-item {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 5px solid #ff6600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .booking-details {
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .cancel-btn {
+      background:#ff6600;
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: center;
+      margin-left: 20px;
+    }
+
+    .cancel-btn:hover {
+      background: #e65c00;
+    }
+
+    @media (max-width:150px){
+      .booking-inner{
+        flex-direction:column;
+        align-items:center
+    }
+      .booking-image-wrap{
+        flex:0 0 auto;
+        width: 120px
+      }
+      select,input,button,label{
+        width:100%;
+        max-width:100%;
+        padding-left:16px;
+        padding-right:16px
+    }
+      .booking-container{
+        width:100%;
+        padding:18px
+    }
+    
+    }
+    /* responsive tweaks for brand label (booking anchored left) */
+    @media (max-width:900px) {
+      .brand-corner{ left: 16px; top: 14px; font-size:0.85rem; padding:5px 8px; }
+    }
+    @media (max-width:480px) {
+      .brand-corner{ left: 12px; top: 10px; font-size:0.8rem; padding:4px 7px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="booking-container">
+    <div class="brand-corner">SeffronSky</div>
+    <h1>Table Booking</h1>
+    <p id="welcomeMsg"></p>
+
+    <div class="booking-inner">
+      <div class="booking-image-wrap">
+        <img src="assets/table.png" alt="Table" class="booking-image">
+      </div>
+
+      <form id="bookingForm">
+        <label for="tableNumber">Select Table Number:</label>
+        <select id="tableNumber" required>
+          <!-- options populated by JS to avoid showing already-booked tables -->
+        </select>
+
+        <label for="numPeople">How Many People:</label>
+        <input type="number" id="numPeople" placeholder="Enter number of people" min="1" required />
+
+        <button type="submit">Book Table</button>
+      </form>
+    </div>
+
+    <div class="bookings-list" id="bookingsList"></div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("user"));
+    const welcomeMsg = document.getElementById("welcomeMsg");
+    const bookingsList = document.getElementById("bookingsList");
+
+    if (!user) {
+      alert("Please login first!");
+      window.location.href = "login.html";
+    } else {
+      welcomeMsg.textContent = `Welcome, ${user.name}!`;
+    }
+
+    // Load existing bookings
+    function loadBookings() {
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      const userBookings = bookings.filter(b => b.email === user.email);
+
+      bookingsList.innerHTML = "<h3>Your Bookings:</h3>";
+
+      if (userBookings.length === 0) {
+        bookingsList.innerHTML += "<p>No bookings yet.</p>";
+      } else {
+        userBookings.forEach((b, i) => {
+          const div = document.createElement("div");
+          div.classList.add("booking-item");
+          div.innerHTML = `
+            <div class="booking-details">
+              <strong>Table:</strong> ${b.tableNumber} |
+              <strong>People:</strong> ${b.numPeople}<br>
+              <small><em>Booked on ${b.date}</em></small>
+            </div>
+              <div>
+                <button class="cancel-btn" onclick="cancelBooking(${i})">Cancel</button>
+              </div>
+          `;
+          bookingsList.appendChild(div);
+        });
+      }
+    }
+
+    // build table options and then load bookings
+    function populateTableOptions() {
+      const select = document.getElementById('tableNumber');
+      if (!select) return;
+      const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      // gather booked table numbers (any user)
+      const booked = new Set(bookings.map(b => String(b.tableNumber)));
+
+      // assume 10 tables (1..10)
+      const totalTables = 10;
+      select.innerHTML = '<option value="">-- Choose Table --</option>';
+      for (let i = 1; i <= totalTables; i++) {
+        const val = String(i);
+        const opt = document.createElement('option');
+        opt.value = val;
+        if (booked.has(val)) {
+          opt.disabled = true;
+          opt.textContent = `Table ${i} (Booked)`;
+        } else {
+          opt.textContent = `Table ${i}`;
+        }
+        select.appendChild(opt);
+      }
+    }
+
+    // initial populate
+    populateTableOptions();
+
+    loadBookings();
+
+    // Handle booking
+    document.getElementById("bookingForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const tableNumber = document.getElementById("tableNumber").value;
+      const numPeople = document.getElementById("numPeople").value;
+
+      if (!tableNumber || !numPeople) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      // double-check the table wasn't booked by another tab in between
+      const currentBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      if (currentBookings.some(b => String(b.tableNumber) === String(tableNumber))) {
+        alert('Sorry, this table was just booked. Please choose another table.');
+        populateTableOptions();
+        return;
+      }
+
+      const newBooking = {
+        email: user.email,
+        tableNumber,
+        numPeople,
+        date: new Date().toLocaleString(),
+        status: "Booked"
+      };
+
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      bookings.push(newBooking);
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+
+      // show non-blocking success message and countdown, then redirect
+      const bookingsContainer = document.querySelector('.booking-container');
+      const msg = document.createElement('div');
+      msg.id = 'bookingMessage';
+      msg.style.margin = '12px 20px';
+      msg.style.padding = '10px';
+      msg.style.background = '#fff7ee';
+      msg.style.border = '1px solid #ff6600';
+      msg.style.borderRadius = '8px';
+      msg.style.color = '#333';
+      msg.style.fontWeight = '600';
+      msg.textContent = 'Table booked successfully! Redirecting to menu in 3 seconds...';
+      // remove any previous message
+      const old = document.getElementById('bookingMessage');
+      if (old) old.remove();
+      bookingsContainer.insertBefore(msg, bookingsContainer.firstChild);
+
+      document.getElementById("bookingForm").reset();
+      populateTableOptions();
+      loadBookings();
+
+      // 3-second countdown then redirect to index.html
+      let countdown = 3;
+      const intervalId = setInterval(() => {
+        countdown -= 1;
+        if (countdown > 0) {
+          msg.textContent = `Table booked successfully! Redirecting to menu in ${countdown} second${countdown > 1 ? 's' : ''}...`;
+        } else {
+          clearInterval(intervalId);
+          window.location.href = 'Menu.html';
+        }
+      }, 1000);
+    });
+
+    // Cancel booking manually
+    function cancelBooking(index) {
+      const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      const userBookings = bookings.filter(b => b.email === user.email);
+
+      const booking = userBookings[index];
+      if (!booking) return;
+
+      const confirmCancel = confirm(`Cancel Table ${booking.tableNumber}?`);
+      if (confirmCancel) {
+        // remove matching booking(s) by exact match of email, tableNumber and date
+        const updatedBookings = bookings.filter(b => !(b.email === booking.email && String(b.tableNumber) === String(booking.tableNumber) && b.date === booking.date));
+        localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+        // notify other pages/tabs that bookings changed
+        try { localStorage.setItem('booking_cleared_at', Date.now().toString()); } catch(e) {}
+        alert("Booking cancelled successfully!");
+        // refresh table options and booking list
+        populateTableOptions();
+        loadBookings();
+      }
+    }
+
+    // Payment feature removed. Bookings can only be cancelled manually.
+  </script>
+</body>
+</html>

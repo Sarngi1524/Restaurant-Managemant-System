@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Feedback</title>
+  <style>
+    /* Make spacing uniform and predictable */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg: #fffafc;
+      --card: #fff;
+      --muted: #666;
+      --accent: #ff6600; /* baby-pink accent */
+      --accent-dark:#ff6600;
+      --radius: 12px;
+      --gap: 16px;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background:url('assets/food background.jpg') no-repeat center center/cover;
+      color: #222;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Make feedback form full-screen and center content */
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background:url('assets/food background.jpg') no-repeat center center/cover;
+    }
+
+    .feedback-container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.92);
+      border-radius: 12px;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.35);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-self: center;
+      height: calc(100vh - 48px); /* leave a little breathing room */
+    }
+    /* brand corner */
+    .feedback-container { position: relative; }
+    .brand-corner{
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      color: var(--accent-dark);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font:weight 10px;
+      z-index: 50;
+      font-size:0.9rem;
+      font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      color: var(--accent-dark);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: transparent;
+      flex: 1 1 auto;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ff6600;
+      outline: none;
+      font-size: 15px;
+      background: #fff;
+      color: inherit;
+    }
+
+  textarea { height: auto; resize: none; flex: 1 1 auto; min-height: 140px; }
+
+    label { font-weight: 600; color: var(--muted); }
+
+    .rating { display:flex; gap:10px; align-items:center; }
+
+    .stars { display:flex; gap:8px; cursor:pointer; }
+
+    .star {
+       font-size: 22px;
+       color: #ffa76c7c;
+       transition: color 0.15s; 
+      }
+    .star.selected { color: var(--accent); }
+
+    .controls { display:flex; gap:12px; }
+    .controls button { flex:1; }
+
+    button {
+      padding: 12px 14px;
+      background: var(--accent);
+      color: white;
+      font-size: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent-dark); }
+
+  .view-feedback { background: #ff6600; }
+
+  /* Make submit and view buttons sit on same row at bottom when there's space */
+  .controls { display:flex; gap:12px; margin-top: 6px; }
+  .controls button { flex:1; }
+
+    .feedback-list { margin-top: 8px; background: var(--card); padding: 12px; border-radius: 8px; max-height: 260px; overflow-y:auto; }
+    .feedback-item { border-bottom: 1px solid #ffffff; padding: 10px 0; }
+    .feedback-item:last-child { border-bottom: none; }
+
+    /* Responsive tweaks */
+    @media (max-width: 640px) {
+      body { padding: 18px; }
+      .feedback-container { padding: 18px; }
+      .controls { flex-direction: column; }
+    }
+    /* responsive tweaks for brand label (feedback anchored left) */
+    @media (max-width:900px) {
+      .brand-corner{ left: 16px; top: 14px; font-size:0.85rem; padding:5px 8px; }
+    }
+    @media (max-width:480px) {
+      .brand-corner{ left: 12px; top: 10px; font-size:0.8rem; padding:4px 7px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="feedback-container">
+    <div class="brand-corner">SeffronSky</div>
+    <h1>Customer Feedback</h1>
+    <form id="feedbackForm">
+      <label for="name">Your Name</label>
+      <input type="text" id="name" placeholder="Enter your name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required>
+
+      <label>Rate the Food</label>
+      <div class="rating" id="foodRating">
+        <div class="stars" id="foodStars">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+      </div>
+
+      <label>Rate the Service</label>
+      <select id="serviceRating" required>
+        <option value="">-- Select Rating --</option>
+        <option value="Excellent">Excellent</option>
+        <option value="Good">Good</option>
+        <option value="Average">Average</option>
+        <option value="Poor">Poor</option>
+      </select>
+
+      <label for="comments">Questions / Suggestions</label>
+      <textarea id="comments" placeholder="Share your feedback here..." required></textarea>
+
+      <button type="submit">Submit Feedback</button>
+      <button type="button" class="view-feedback" id="viewBtn">View All Feedback</button>
+    </form>
+
+    <div class="feedback-list" id="feedbackList" style="display:none;"></div>
+  </div>
+
+  <script>
+    let foodRating = 0;
+    const stars = document.querySelectorAll("#foodStars .star");
+    const form = document.getElementById("feedbackForm");
+    const feedbackListDiv = document.getElementById("feedbackList");
+
+    // Handle food rating selection
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        foodRating = parseInt(star.getAttribute("data-value"));
+        stars.forEach(s => s.classList.remove("selected"));
+        for (let i = 0; i < foodRating; i++) {
+          stars[i].classList.add("selected");
+        }
+      });
+    });
+
+    // Submit feedback
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const serviceRating = document.getElementById("serviceRating").value;
+      const comments = document.getElementById("comments").value;
+
+      if (foodRating === 0) {
+        alert("Please rate the food!");
+        return;
+      }
+
+      const feedback = {
+        name,
+        email,
+        foodRating,
+        serviceRating,
+        comments,
+        date: new Date().toLocaleString()
+      };
+
+      const feedbackList = JSON.parse(localStorage.getItem("feedback")) || [];
+      feedbackList.push(feedback);
+      localStorage.setItem("feedback", JSON.stringify(feedbackList));
+
+      // clear form and redirect to login
+      form.reset();
+      stars.forEach(s => s.classList.remove("selected"));
+      foodRating = 0;
+      // short pause so user sees the cleared form, then redirect
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 300);
+    });
+
+    // View feedback
+    document.getElementById("viewBtn").addEventListener("click", () => {
+      const feedbackList = JSON.parse(localStorage.getItem("feedback")) || [];
+      if (feedbackList.length === 0) {
+        alert("No feedback submitted yet!");
+        return;
+      }
+
+      feedbackListDiv.style.display = "block";
+      feedbackListDiv.innerHTML = "<h3>All Feedback:</h3>";
+
+      feedbackList.forEach(fb => {
+        const div = document.createElement("div");
+        div.classList.add("feedback-item");
+        div.innerHTML = `
+          <strong>${fb.name}</strong> (${fb.email})<br>
+          ⭐ Food: ${fb.foodRating}/5 | 💬 Service: ${fb.serviceRating}<br>
+          <em>${fb.comments}</em><br>
+          <small>${fb.date}</small>
+        `;
+        feedbackListDiv.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>

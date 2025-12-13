@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splash Screen</title>
+  <link rel="stylesheet" href="splash.css">
+</head>
+<body>
+  <div class="splash" id="splashScreen">
+    <div class="overlay">
+      <img src="assets/food.png" alt="Pointsell Logo" class="logo">
+      <h1>Saffron Sky</h1>
+    </div>
+  </div>
+  <style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
+}
+
+body, html {
+  height: 100%;
+  width: 100%;
+
+}
+
+.splash {
+  background: url("assets/food background.jpg") no-repeat center center/cover;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.splash-content {
+  text-align: center;
+  background: rgba(255, 167, 108, 0.5);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0px 4px 20px rgba(0,0,0,0.5);
+}
+
+
+
+.logo {
+  width: 400px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #f88f49d8;
+  font-size: 50
+  0px;
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  
+}
+  </style>
+
+  <script>// When user clicks anywhere on the splash screen, go to login.html
+document.getElementById("splashScreen").addEventListener("click", function() {
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>
