@@ -433,6 +433,9 @@ app.put('/api/admin/update-product/:id', (req, res) => {
         res.json({ success: true });
     });
 });
+app.get("/", (req, res) => {
+    res.redirect("/user/index.html");
+});
 app.listen(3000, () => {
     console.log("Server running at http://localhost:3000/user/index.html");
 });
