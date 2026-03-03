@@ -1,0 +1,21 @@
+{
+  "name": "Restaurant Management System",
+  "short_name": "RMS",
+  "start_url": "/user/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff6b6b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/food.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/food.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

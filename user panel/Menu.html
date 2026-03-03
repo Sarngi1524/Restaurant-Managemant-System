@@ -1204,6 +1204,28 @@ function _safeGet(key, fallback = null) {
     try { return JSON.parse(raw); } catch (e) { return fallback; }
 }
 
+function normalizeImageSrc(src) {
+    if (!src || typeof src !== 'string') return '/user/assets/default.jpg';
+    const value = src.trim();
+    if (!value) return '/user/assets/default.jpg';
+    if (value.startsWith('data:') || value.startsWith('blob:')) return value;
+    if (value.startsWith('/')) return value;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+        try {
+            const u = new URL(value);
+            const h = (u.hostname || '').toLowerCase();
+            if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return u.pathname || value;
+            return value;
+        } catch (e) {
+            return value;
+        }
+    }
+    if (value.startsWith('assets/')) return `/user/${value}`;
+    if (value.startsWith('user/')) return `/${value}`;
+    if (value.startsWith('./assets/')) return `/user/${value.slice(2)}`;
+    return value;
+}
+
 // 1. Changed: Start with an empty array. Data will now come from MySQL.
 let menuData = []; 
 let orderItems = [];
@@ -1280,7 +1302,7 @@ async function init() {
                 name: i.name, 
                 price: i.price, 
                 quantity: i.qty || i.quantity, 
-                image: i.image 
+                image: normalizeImageSrc(i.image)
             }));
         }
     } catch (e) { }
@@ -1303,7 +1325,7 @@ function renderMenu(data = menuData) {
         const count = (typeof item.rating_count !== 'undefined') ? item.rating_count : (item.rating_count || 0);
         return `
         <div class="menu-card">
-            <img src="${item.image_url || item.image || '../assets/default.jpg'}" alt="${item.name}" class="menu-card-image">
+            <img src="${normalizeImageSrc(item.image_url || item.image || '/user/assets/default.jpg')}" alt="${item.name}" class="menu-card-image">
             <div class="menu-card-content">
                 <div class="menu-card-header">
                     <h3 class="menu-card-title">${item.name}</h3>
@@ -1402,7 +1424,7 @@ function addToOrder(id) {
 
     const existing = orderItems.find(o => String(o.id) === key);
     if (existing) existing.quantity += 1;
-    else orderItems.push({ id: item.id || item._id, name: item.name, price: Number(item.price || 0), quantity: 1, image: item.image_url || item.image });
+    else orderItems.push({ id: item.id || item._id, name: item.name, price: Number(item.price || 0), quantity: 1, image: normalizeImageSrc(item.image_url || item.image) });
 
     renderOrderItems();
     updateOrderSummary();
@@ -1417,7 +1439,7 @@ function renderOrderItems() {
     placeOrderBtn.disabled = false;
     orderItemsContainer.innerHTML = orderItems.map(it => `
         <div class="order-item">
-            <img src="${it.image || '../assets/default.jpg'}" class="order-item-image">
+            <img src="${normalizeImageSrc(it.image || '/user/assets/default.jpg')}" class="order-item-image">
             <div class="order-item-details">
                 <div class="order-item-name">${it.name}</div>
                 <div class="order-item-price">₹${Number(it.price).toFixed(2)}</div>

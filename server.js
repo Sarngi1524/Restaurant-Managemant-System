@@ -7,6 +7,33 @@ const multer = require('multer');
 const app = express();
 app.use(express.json());
 
+function normalizeImagePath(src) {
+    if (!src || typeof src !== "string") return src;
+    const value = src.trim();
+    if (!value) return value;
+    if (value.startsWith("data:") || value.startsWith("blob:")) return value;
+    if (value.startsWith("/")) return value;
+
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+        try {
+            const u = new URL(value);
+            const host = (u.hostname || "").toLowerCase();
+            if (host === "localhost" || host === "127.0.0.1" || host === "::1") {
+                return u.pathname || value;
+            }
+            return value;
+        } catch (e) {
+            return value;
+        }
+    }
+
+    if (value.startsWith("assets/")) return `/user/${value}`;
+    if (value.startsWith("user/")) return `/${value}`;
+    if (value.startsWith("./assets/")) return `/user/${value.slice(2)}`;
+
+    return value;
+}
+
 // 1. Database Connection
 const db = mysql.createConnection({
     host: "localhost",
@@ -78,6 +105,12 @@ db.query(createFeedbackTable, (err) => {
 // 2. Serve static folders
 app.use("/user", express.static(path.join(__dirname, "user panel")));
 app.use("/admin", express.static(path.join(__dirname, "admin panel")));
+app.get("/manifest.json", (req, res) => {
+    res.sendFile(path.join(__dirname, "manifest.json"));
+});
+app.get("/service-worker.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "service-worker.js"));
+});
 
 // Ensure upload directory exists inside user panel assets
 const userAssetsDir = path.join(__dirname, 'user panel', 'assets');
@@ -259,7 +292,7 @@ app.get("/api/admin/stats", (req, res) => {
                         id: b.product_id,
                         name: b.name,
                         category: b.category,
-                        image: b.image_url,
+                        image: normalizeImagePath(b.image_url),
                         qtySold: Number(b.qtySold) || 0,
                         revenue: Number(b.revenue) || 0
                     }));
@@ -324,12 +357,14 @@ app.get("/api/products", (req, res) => {
             console.error('Error fetching products:', err);
             return res.json([]);
         }
-                const mapped = results.map(r => ({
+                const mapped = results.map(r => {
+            const normalizedImage = normalizeImagePath(r.image_url);
+            return ({
             id: r.id,
             name: r.name,
             price: r.price,
-            image_url: r.image_url,
-            image: r.image_url,
+            image_url: normalizedImage,
+            image: normalizedImage,
             description: r.description,
             category: r.category,
             status: r.status,
@@ -337,7 +372,8 @@ app.get("/api/products", (req, res) => {
             created_at: r.created_at,
             rating: Number(r.avg_rating) ? Number(Number(r.avg_rating).toFixed(1)) : 0,
             rating_count: r.rating_count || 0
-        }));
+        });
+        });
         // if single requested return object for convenience
         if (id) return res.json({ success: true, product: mapped[0] || null });
         res.json(mapped);
@@ -372,8 +408,9 @@ app.delete("/api/admin/delete-product/:id", (req, res) => {
 app.post("/api/admin/add-product", (req, res) => {
     console.log('Add product payload:', req.body);
     const { name, price, image, description, category, status, quantity } = req.body;
+    const normalizedImage = normalizeImagePath(image);
     const sql = "INSERT INTO products (name, price, image_url, description, category, status, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    db.query(sql, [name, price, image, description, category, status, quantity], (err, result) => {
+    db.query(sql, [name, price, normalizedImage, description, category, status, quantity], (err, result) => {
         if (err) {
             console.error("MySQL Insert Error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
@@ -386,8 +423,9 @@ app.post("/api/admin/add-product", (req, res) => {
 app.put('/api/admin/update-product/:id', (req, res) => {
     const id = req.params.id;
     const { name, price, image, description, category, status, quantity } = req.body;
+    const normalizedImage = normalizeImagePath(image);
     const sql = "UPDATE products SET name=?, price=?, image_url=?, description=?, category=?, status=?, quantity=? WHERE id=?";
-    db.query(sql, [name, price, image, description, category, status, quantity, id], (err, result) => {
+    db.query(sql, [name, price, normalizedImage, description, category, status, quantity, id], (err, result) => {
         if (err) {
             console.error('Update product error', err);
             return res.status(500).json({ success: false, message: 'Database error' });

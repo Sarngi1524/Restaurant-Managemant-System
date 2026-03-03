@@ -721,6 +721,11 @@ table {
         height: 200px;
         left: 20%;
     }
+     .center-text {
+        font-size: 0.9rem;
+        top: 45%;
+        left: 18%;
+    }
 
     .chart-legend {
         font-size: 0.9rem;
@@ -1051,7 +1056,7 @@ table {
     .center-text {
         font-size: 0.9rem;
         top: 45%;
-        left: 15%;
+        left: 18%;
     }
 
     .center-symbol {
@@ -1320,20 +1325,26 @@ table {
 
     body::before {
         font-size: 1.8rem;
-        left: 10px;
+        left: 15px;
         top: 5px;
     }
 
     .dashboard-header {
         gap: 8px;
         margin-bottom: 20px;
+        margin-top: 28px;
     }
 
     .button-group {
         gap: 6px;
     }
 
-    .dashboard-btn,
+    .dashboard-btn{
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
     .admin-nav .nav-btn,
     .logout-btn {
         padding: 9px 10px;
@@ -1356,12 +1367,13 @@ table {
 
     .center-text {
         font-size: 0.8rem;
-        top: 40%;
-        left: 10%;
+        top: 45%;
+        left: 16%;
     }
 
     .center-symbol {
         font-size: 1.8rem;
+        margin-left: 10px;
     }
 
     .balance-amount {

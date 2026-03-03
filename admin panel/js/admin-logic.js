@@ -31,6 +31,28 @@ function dataURLToBlob(dataurl) {
     return new Blob([u8arr], { type: mime });
 }
 
+function normalizeImageSrc(src) {
+    if (!src || typeof src !== 'string') return '/user/assets/default.jpg';
+    const value = src.trim();
+    if (!value) return '/user/assets/default.jpg';
+    if (value.startsWith('data:') || value.startsWith('blob:')) return value;
+    if (value.startsWith('/')) return value;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+        try {
+            const u = new URL(value);
+            const h = (u.hostname || '').toLowerCase();
+            if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return u.pathname || value;
+            return value;
+        } catch (e) {
+            return value;
+        }
+    }
+    if (value.startsWith('assets/')) return `/user/${value}`;
+    if (value.startsWith('user/')) return `/${value}`;
+    if (value.startsWith('./assets/')) return `/user/${value.slice(2)}`;
+    return value;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     function formatDateLabel(input) {
         if (!input) return '';
@@ -230,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             return `
                             <div class="dish-item" style="border-left:4px solid ${color};">
                                 <div class="dish-info">
-                                    <img src="${d.image || '../assets/default.jpg'}" class="dish-img">
+                                    <img src="${normalizeImageSrc(d.image || '/user/assets/default.jpg')}" class="dish-img">
                                     <div>
                                         <strong>${d.name}</strong><br>
                                         <span style="color: ${color}">₹${Number(d.revenue || 0).toFixed(2)}</span>
@@ -281,12 +303,7 @@ function loadProducts() {
 function renderProductRows(products, offline = false) {
     const tbody = document.getElementById("productTableBody");
     if (!tbody) return; // not on product page
-    const normalize = src => {
-        if (!src) return '/user/assets/default.jpg';
-        if (src.startsWith('http') || src.startsWith('/')) return src;
-        // otherwise treat as relative to user folder
-        return `/user/${src}`;
-    };
+    const normalize = src => normalizeImageSrc(src);
     tbody.innerHTML = (products || []).map(p => {
         const imgSrc = p.image || p.image_url; // prefer explicit field
         return `

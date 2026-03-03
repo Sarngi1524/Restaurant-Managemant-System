@@ -654,6 +654,28 @@
 
   <script>
    (function() {
+    function normalizeImageSrc(src) {
+        if (!src || typeof src !== 'string') return '';
+        const value = src.trim();
+        if (!value) return '';
+        if (value.startsWith('data:') || value.startsWith('blob:')) return value;
+        if (value.startsWith('/')) return value;
+        if (value.startsWith('http://') || value.startsWith('https://')) {
+            try {
+                const u = new URL(value);
+                const h = (u.hostname || '').toLowerCase();
+                if (h === 'localhost' || h === '127.0.0.1' || h === '::1') return u.pathname || value;
+                return value;
+            } catch (e) {
+                return value;
+            }
+        }
+        if (value.startsWith('assets/')) return `/user/${value}`;
+        if (value.startsWith('user/')) return `/${value}`;
+        if (value.startsWith('./assets/')) return `/user/${value.slice(2)}`;
+        return value;
+    }
+
     // 1. Get current order from localStorage (Temporary UI State)
     const order = JSON.parse(localStorage.getItem('currentOrder') || 'null');
     
@@ -676,7 +698,8 @@
     const tbody = document.querySelector('#itemsTable tbody');
     order.items.forEach(it => {
         const tr = document.createElement('tr');
-        const imgHtml = it.image ? `<img src="${it.image}" alt="${it.name}" class="item-thumb">` : '';
+        const safeImage = normalizeImageSrc(it.image);
+        const imgHtml = safeImage ? `<img src="${safeImage}" alt="${it.name}" class="item-thumb">` : '';
         tr.innerHTML = `
             <td class="item-cell">${imgHtml}<span class="item-name">${it.name}</span></td>
             <td>${it.qty}</td>
