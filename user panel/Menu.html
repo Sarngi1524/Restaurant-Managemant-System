@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PointSell - Restaurant POS</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- inline styles are included later in this file; avoid external request to styles.css which may 404 -->
 </head>
 <body>
     <div class="app-container">
@@ -16,6 +16,11 @@
             <header class="header">
                 <div class="brand">
                     <h1>Saffron<span>Sky</span></h1>
+                    <div class="category-icons">
+                        <span class="cat-icon foodie" title="Foodie">🍽️</span>
+                        <span class="cat-icon cold-drink" title="Cold Drink">🥤</span>
+                        <span class="cat-icon others" title="Others">✳️</span>
+                    </div>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search Anything Here" id="searchInput">
@@ -79,8 +84,7 @@
         </aside>
     </div>
 
-    <button id="logoutBtn">Logout</button>
-    <script src="script.js"></script>
+    <!-- external script.js removed to avoid 404/MIME errors; the main script is embedded later in this file -->
     <script>
   (function(){
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -89,13 +93,15 @@
       window.location.href = "index.html";
       return;
     }
-    const user = JSON.parse(localStorage.getItem("loggedUser") || "{}");
+    const _rawUser = localStorage.getItem('loggedUser');
+    const user = (_rawUser && _rawUser !== 'undefined') ? JSON.parse(_rawUser) : {};
     const welcomeEl = document.getElementById("welcome"); // add <div id="welcome"></div> where you want name
     if (welcomeEl && user.name) welcomeEl.textContent = "Welcome, " + user.name;
         // Display table number from bookings (find latest booking for this user)
         const tableDisplay = document.getElementById('tableNumberDisplay');
         try {
-            const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const rawBookings = localStorage.getItem('bookings');
+            const allBookings = (rawBookings && rawBookings !== 'undefined') ? JSON.parse(rawBookings) : [];
             const userBookings = allBookings.filter(b => b.email === (user.email || ''));
             if (userBookings.length > 0) {
                 const latest = userBookings[userBookings.length - 1];
@@ -107,12 +113,6 @@
             if (tableDisplay) tableDisplay.textContent = 'Table: -';
         }
   })();
-
-  document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("loggedUser");
-    window.location.href = "index.html";
-  });
     </script>
 </body>
 </html>
@@ -125,10 +125,17 @@
     box-sizing: border-box;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background: #f5f5f5;
     color: #2d3748;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .app-container {
@@ -138,7 +145,6 @@ body {
 }
 
 /* Sidebar removed - main content will take full width */
-
 
 .logo svg {
     width: 40px;
@@ -200,6 +206,7 @@ body {
     align-items: center;
     gap: 2rem;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
 .brand h1 {
@@ -214,9 +221,11 @@ body {
 }
 
 .search-bar {
+    margin-top: 0;
     flex: 1;
     max-width: 500px;
     position: relative;
+    min-width: 200px;
 }
 
 .search-bar input {
@@ -226,10 +235,12 @@ body {
     border-radius: 8px;
     font-size: 0.875rem;
     outline: none;
+    transition: border-color 0.3s ease;
 }
 
 .search-bar input:focus {
     border-color: #ff6b35;
+    box-shadow: 0 0 5px rgba(255, 107, 53, 0.3);
 }
 
 .search-btn {
@@ -242,6 +253,11 @@ body {
     cursor: pointer;
     padding: 0.5rem;
     color: #a0aec0;
+    transition: color 0.3s ease;
+}
+
+.search-btn:hover {
+    color: #ff6b35;
 }
 
 .search-btn svg {
@@ -280,7 +296,7 @@ body {
     width: 100%;
     height: 160px;
     object-fit: cover;
-    background:#ffffff ;
+    background: #ffffff;
 }
 
 .menu-card-content {
@@ -292,6 +308,7 @@ body {
     justify-content: space-between;
     align-items: start;
     margin-bottom: 0.5rem;
+    gap: 10px;
 }
 
 .menu-card-title {
@@ -304,6 +321,7 @@ body {
     font-size: 1rem;
     font-weight: 700;
     color: #ff6b35;
+    white-space: nowrap;
 }
 
 .menu-card-description {
@@ -317,15 +335,55 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.rating {
+.rating svg {
+    width: 14px;
+    height: 14px;
+    fill: #ff6600;
+}
+
+.menu-star {
+    font-size: 18px;
+    color: #ccc;
+    margin-left: 4px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.menu-star:hover, .menu-star.selected {
+    color: #ff6b35;
+}
+
+.category-icons {
+    margin-top: 3px;
     display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #2d3748;
+    gap: 8px;
+    justify-content: center;
+}
+
+.cat-icon {
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.cat-icon:hover {
+    transform: scale(1.1);
+}
+
+.cat-icon.foodie {
+    color: #ff6b35;
+}
+
+.cat-icon.cold-drink {
+    color: #3498db;
+}
+
+.cat-icon.others {
+    color: #888;
 }
 
 .rating svg {
@@ -345,6 +403,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
+    white-space: nowrap;
 }
 
 .add-product-btn:hover {
@@ -377,6 +436,11 @@ body {
     cursor: pointer;
     margin-bottom: 1rem;
     color: white;
+    transition: background 0.3s ease;
+}
+
+.notification-btn:hover {
+    background: #e55a2b;
 }
 
 .notification-btn svg {
@@ -399,6 +463,11 @@ body {
     cursor: pointer;
     color: #a4a4a4;
     line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #ff6b35;
 }
 
 .order-items {
@@ -427,6 +496,7 @@ body {
     height: 60px;
     border-radius: 8px;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 .order-item-details {
@@ -463,6 +533,12 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.quantity-btn:hover {
+    background: #ff6b35;
+    color: white;
 }
 
 .quantity-display {
@@ -483,6 +559,11 @@ body {
     margin-left: auto;
     font-size: 1.2rem;
     line-height: 1;
+    transition: background 0.2s ease;
+}
+
+.remove-item-btn:hover {
+    background: #fdd;
 }
 
 .order-summary {
@@ -529,106 +610,604 @@ body {
     cursor: not-allowed;
 }
 
+#logoutBtn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 16px;
+    background: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    z-index: 500;
+    transition: background 0.3s ease;
+}
+
+#logoutBtn:hover {
+    background: #e55a2b;
+}
+
+/* Responsive Design */
 @media (max-width: 1200px) {
+    .main-content {
+        padding: 1.5rem;
+    }
+
+    .order-sidebar {
+        width: 300px;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .header {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-content {
+        padding: 1.25rem;
+    }
+
     .order-sidebar {
         width: 280px;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .menu-card-image {
+        height: 140px;
+    }
+
+    .header {
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-bar {
+        max-width: 400px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+        margin-bottom: 1.25rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 1rem;
+        width: 100%;
+    }
+
+    .order-sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        border-left: none;
+        border-top: 2px solid #e2e8f0;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .order-header {
+        padding: 1rem;
+        border-right: 1px solid #e2e8f0;
+        border-bottom: none;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .notification-btn {
+        margin-bottom: 0;
+    }
+
+    .order-items {
+        padding: 1rem;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .order-item {
+        flex-direction: column;
+        min-width: 120px;
+        margin-bottom: 0;
+    }
+
+    .order-summary {
+        padding: 1rem;
+        flex-shrink: 0;
+        border-left: 1px solid #e2e8f0;
+        border-top: none;
+        min-width: 180px;
+    }
+
+    .place-order-btn {
+        margin: 1rem;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .menu-card-image {
+        height: 120px;
+    }
+
+    .menu-card-content {
+        padding: 0.75rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .search-bar {
+        width: 100%;
+        max-width: none;
+    }
+
+    #logoutBtn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        width: 60px;
+    .main-content {
+        padding: 0.75rem;
     }
-    
+
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .menu-card {
+        border-radius: 8px;
+    }
+
+    .menu-card-image {
+        height: 100px;
+    }
+
+    .menu-card-content {
+        padding: 0.5rem;
+    }
+
+    .menu-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 0.35rem;
+        gap: 2px;
+    }
+
+    .menu-card-title {
+        font-size: 0.9rem;
+    }
+
+    .menu-card-price {
+        font-size: 0.9rem;
+    }
+
+    .menu-card-description {
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .menu-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .add-product-btn {
+        width: 100%;
+        padding: 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    .rating {
+        font-size: 0.8rem;
+    }
+
+    .header {
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .brand h1 {
+        font-size: 1.4rem;
+    }
+
+    .search-bar input {
+        padding: 0.6rem 2.5rem 0.6rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .order-header {
+        padding: 0.75rem;
+        min-width: 120px;
+    }
+
+    .order-number {
+        font-size: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .close-btn {
+        font-size: 1.2rem;
+    }
+
+    .order-items {
+        padding: 0.75rem;
+    }
+
+    .order-item {
+        min-width: 100px;
+        padding: 0.5rem;
+    }
+
+    .order-item-image {
+        width: 50px;
+        height: 50px;
+    }
+
+    .order-item-name {
+        font-size: 0.75rem;
+    }
+
+    .order-item-price {
+        font-size: 0.75rem;
+    }
+
+    .quantity-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+    }
+
+    .remove-item-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 1rem;
+    }
+
+    .order-summary {
+        padding: 0.75rem;
+        min-width: 140px;
+        font-size: 0.75rem;
+    }
+
+    .summary-row {
+        margin-bottom: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .summary-row.total {
+        font-size: 0.95rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+    }
+
+    .place-order-btn {
+        margin: 0.75rem;
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    #logoutBtn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+
+    .notification-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .notification-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .main-content {
+        padding: 0.5rem;
+        overflow-y: auto;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    .menu-card {
+        border-radius: 6px;
+    }
+
+    .menu-card-image {
+        height: 80px;
+    }
+
+    .menu-card-content {
+        padding: 0.35rem;
+    }
+
+    .menu-card-header {
+        margin-bottom: 0.25rem;
+    }
+
+    .menu-card-title {
+        font-size: 0.8rem;
+    }
+
+    .menu-card-price {
+        font-size: 0.8rem;
+    }
+
+    .menu-card-description {
+        font-size: 0.65rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .add-product-btn {
+        padding: 0.35rem;
+        font-size: 0.65rem;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .brand {
+        width: 100%;
+        text-align: center;
+    }
+
+    .brand h1 {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+    }
+
+    .category-icons {
+        gap: 6px;
+    }
+
+    .cat-icon {
+        font-size: 0.95rem;
+    }
+
+    .search-bar {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .search-bar input {
+        padding: 0.5rem 2.2rem 0.5rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .search-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
     .order-sidebar {
-        position: fixed;
-        right: -320px;
-        top: 0;
-        height: 100vh;
-        z-index: 1000;
-        transition: right 0.3s;
+        max-height: 280px;
+        flex-direction: row;
+        overflow-x: auto;
+        border-top: 2px solid #e2e8f0;
     }
-    
-    .order-sidebar.active {
-        right: 0;
+
+    .order-header {
+        padding: 0.5rem;
+        min-width: 100px;
+        flex-direction: column;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .notification-btn {
+        width: 36px;
+        height: 36px;
+        margin-bottom: 0;
+    }
+
+    .notification-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .order-number {
+        font-size: 0.65rem;
+        gap: 3px;
+    }
+
+    .close-btn {
+        font-size: 1rem;
+    }
+
+    .order-items {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .order-item {
+        min-width: 90px;
+        padding: 0.4rem;
+    }
+
+    .order-item-image {
+        width: 45px;
+        height: 45px;
+    }
+
+    .order-item-name {
+        font-size: 0.65rem;
+    }
+
+    .order-item-price {
+        font-size: 0.65rem;
+    }
+
+    .quantity-btn {
+        width: 18px;
+        height: 18px;
+        font-size: 0.65rem;
+    }
+
+    .remove-item-btn {
+        width: 18px;
+        height: 18px;
+        font-size: 0.9rem;
+    }
+
+    .order-summary {
+        padding: 0.5rem;
+        min-width: 120px;
+        font-size: 0.65rem;
+    }
+
+    .summary-row {
+        margin-bottom: 0.4rem;
+        font-size: 0.65rem;
+    }
+
+    .summary-row.total {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .place-order-btn {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+
+    #logoutBtn {
+        padding: 4px 8px;
+        font-size: 0.65rem;
+        top: 5px;
+        right: 5px;
+    }
+
+    .empty-order {
+        padding: 1rem 0.5rem;
+    }
+
+    .empty-order p {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.35rem;
+    }
+
+    .menu-card-image {
+        height: 70px;
+    }
+
+    .menu-card-content {
+        padding: 0.25rem;
+    }
+
+    .brand h1 {
+        font-size: 1rem;
+    }
+
+    .search-bar input {
+        font-size: 0.7rem;
+        padding: 0.4rem 2rem 0.4rem 0.5rem;
+    }
+
+    .menu-card-title {
+        font-size: 0.75rem;
+    }
+
+    .menu-card-price {
+        font-size: 0.75rem;
+    }
+
+    .add-product-btn {
+        font-size: 0.6rem;
+    }
+
+    .order-item-image {
+        width: 40px;
+        height: 40px;
+    }
+
+    .order-summary {
+        min-width: 100px;
+        font-size: 0.6rem;
+    }
+
+    #logoutBtn {
+        font-size: 0.6rem;
     }
 }
 </style>
 
 <!-- script.js -->
 <script>
-// Menu Data
-const menuData = [
-    {
-        id: 1,
-        name: 'Grill Sandwich',
-        price: 80.00,
-        image: 'assets/Grill.jpg',
-        description: ' Golden, crispy bread stuffed with cheesy, flavorful fillings and grilled to perfection.',
-        rating: 4.7
-    },
-    {
-        id: 2,
-        name: 'Dosa',
-        price: 90.00,
-        image: 'assets/Dosa.jpg',
-        description: 'A crispy, golden South Indian delight served hot with chutney and sambar.',
-        rating: 4.8
-    },
-    {
-        id: 3,
-        name: 'Noodles',
-        price: 70.00,
-        image: 'assets/Noodels.jpg',
-        description: ' Stir-fried perfection with fresh veggies and flavorful spices.',
-        rating:4.6
-    },
-    {
-        id: 4,
-        name: 'Frankie',
-        price: 60.00,
-        image: 'assets/frankie.jpg',
-        description: ' A soft roll stuffed with spicy fillings, the ultimate street-style wrap.',
-        rating: 4.4
-    },
-    {
-        id: 5,
-        name: 'Manchurian Noodles',
-        price: 100.00,
-        image: 'assets/Manchurian.jpg',
-        description: 'Fiery Indo-Chinese fusion of noodles tossed with tangy Manchurian balls.',
-        rating: 4.7
-    },
-    {
-        id: 6,
-        name: 'Pani Puri',
-        price: 25.00,
-        image: 'assets/Panipuri.jpg',
-        description: 'Crunchy puris filled with tangy, spicy, and sweet flavored water – a burst of taste in every bite!',
-        rating: 5.0
-    },
-    {
-        id: 7,
-        name: 'Pizza',
-        price: 170.00,
-        image: 'assets/Pizza.jpg',
-        description: ' Cheesy, oven-baked goodness topped with fresh veggies and sauces.',
-        rating: 4.3
-    },
+// Small helper to safely parse JSON values from localStorage
+// Small helper to safely parse JSON values from localStorage
+function _safeGet(key, fallback = null) {
+    const raw = localStorage.getItem(key);
+    if (raw === null || raw === undefined || raw === 'undefined') return fallback;
+    try { return JSON.parse(raw); } catch (e) { return fallback; }
+}
 
-    {
-        id: 8,
-        name: 'Pasta',
-        price: 130.00,
-        image: 'assets/Pasta.jpg',
-        description: 'Creamy, saucy, and perfectly cooked – a comfort food loved worldwide.',
-        rating: 4.3
-    },
-   
-];
-
-// State
+// 1. Changed: Start with an empty array. Data will now come from MySQL.
+let menuData = []; 
 let orderItems = [];
+let currentTableNumber = null;
 
 // DOM Elements
 const menuGrid = document.getElementById('menuGrid');
@@ -636,179 +1215,265 @@ const orderItemsContainer = document.getElementById('orderItems');
 const placeOrderBtn = document.getElementById('placeOrderBtn');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
+// Track selected category (no dropdown anymore, icons control this)
+let selectedCategory = '';
 
 // Initialize
-function init() {
-    // if returning from billing to add more, preload existing currentOrder items
-    try {
-        const existing = JSON.parse(localStorage.getItem('currentOrder') || 'null');
-        if (existing && Array.isArray(existing.items)) {
-            // map items to internal orderItems shape (image already included)
-            orderItems = existing.items.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.qty, image: i.image }));
-        }
-    } catch(e) { /* ignore parse errors */ }
+async function init() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn !== "true") {
+        alert("Please login first.");
+        window.location.href = "login.html";
+        return;
+    }
 
-    renderMenu();
+    const user = _safeGet('loggedUser', {});
+    
+    // 2. NEW: Fetch live products from MySQL database
+    try {
+        const productRes = await fetch("/api/products");
+        if (productRes.ok) {
+            const serverProducts = await productRes.json();
+            // merge server products with any offline products saved while server was down
+            const offline = _safeGet('offlineProducts', []);
+            // prefer server entries (by id) and append offline entries that don't exist on server
+            const serverById = new Map((serverProducts || []).map(p => [String(p.id), p]));
+            const merged = Array.from(serverProducts || []);
+            (offline || []).forEach(op => {
+                const key = String(op.id || op._id || '');
+                if (!key || !serverById.has(key)) merged.push(op);
+            });
+            menuData = merged;
+        } else {
+            console.warn('Products endpoint returned', productRes.status);
+            menuData = _safeGet('offlineProducts', []);
+        }
+        renderMenu(); // Draw the menu after data (server or offline) is ready
+    } catch (err) {
+        console.error("Failed to load products:", err);
+        // fallback to offline products saved in localStorage
+        menuData = _safeGet('offlineProducts', []);
+        renderMenu();
+    }
+
+    // Fetch latest booking for table number
+    const tableDisplay = document.getElementById('tableNumberDisplay');
+    fetch(`/api/user-bookings?email=${user.email}`)
+        .then(res => res.json())
+        .then(userBookings => {
+            if (userBookings && userBookings.length > 0) {
+                const latest = userBookings[userBookings.length - 1];
+                currentTableNumber = latest.tableNumber;
+                if (tableDisplay) tableDisplay.textContent = 'Table: ' + currentTableNumber;
+            } else {
+                if (tableDisplay) tableDisplay.textContent = 'Table: -';
+            }
+        })
+        .catch(err => console.error("Could not fetch table info:", err));
+
+    // Preload existing order
+    try {
+        const existing = _safeGet('currentOrder', null);
+        if (existing && Array.isArray(existing.items)) {
+            orderItems = existing.items.map(i => ({ 
+                id: i.id, 
+                name: i.name, 
+                price: i.price, 
+                quantity: i.qty || i.quantity, 
+                image: i.image 
+            }));
+        }
+    } catch (e) { }
+
     renderOrderItems();
     updateOrderSummary();
 }
 
-// Render Menu (accepts optional data to render filtered results)
 function renderMenu(data = menuData) {
     if (!data || data.length === 0) {
         menuGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#a4a4a4;">No items available</p>';
         return;
     }
 
-    menuGrid.innerHTML = data.map(item => `
+    // if category filter dropdown exists, populate unique categories
+    // (no longer applicable since dropdown is removed)
+
+    menuGrid.innerHTML = data.map(item => {
+        const avg = (typeof item.rating !== 'undefined') ? item.rating : (item.avg_rating || 0);
+        const count = (typeof item.rating_count !== 'undefined') ? item.rating_count : (item.rating_count || 0);
+        return `
         <div class="menu-card">
-            <img src="${item.image}" alt="${item.name}" class="menu-card-image">
+            <img src="${item.image_url || item.image || '../assets/default.jpg'}" alt="${item.name}" class="menu-card-image">
             <div class="menu-card-content">
                 <div class="menu-card-header">
                     <h3 class="menu-card-title">${item.name}</h3>
-                    <span class="menu-card-price">₹${item.price.toFixed(2)}</span>
+                    <span class="menu-card-price">₹${Number(item.price || 0).toFixed(2)}</span>
                 </div>
-                <p class="menu-card-description">${item.description}</p>
+                <p class="menu-card-description">${item.description || ''}</p>
                 <div class="menu-card-footer">
                     <div class="rating">
-                        <svg viewBox="0 0 20 20">
-                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                        </svg>
-                        ${item.rating.toFixed(1)}
+                        <svg viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                        ${avg || 0} <span style="font-weight:400;color:#999;margin-left:6px">(${count})</span>
                     </div>
-                    <button class="add-product-btn" onclick="addToOrder(${item.id})">+ Add Product</button>
+                    <div>
+                        <button class="add-product-btn" onclick="addToOrder('${item.id || item._id}')">+ Add Product</button>
+                    </div>
+                </div>
+                <div style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+                    <span style="font-size:0.85rem;color:#666">Rate this:</span>
+                    ${[1,2,3,4,5].map(n => `<span class="menu-star" onclick="submitRating('${item.id || item._id}', ${n})" data-value="${n}">★</span>`).join('')}
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
+
+    // Wire up star rating clicks to highlight stars
+    const starElems = menuGrid.querySelectorAll('.menu-star');
+    starElems.forEach(el => {
+        el.addEventListener('click', () => {
+            const val = parseInt(el.getAttribute('data-value'));
+            const parent = el.parentElement;
+            if (!parent) return;
+            const siblings = parent.querySelectorAll('.menu-star');
+            siblings.forEach(s => {
+                const v = parseInt(s.getAttribute('data-value'));
+                if (v <= val) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+        });
+    });
 }
 
-// Search handler — filters by name or description (case-insensitive)
+// Submit a rating for a product
+async function submitRating(productId, rating) {
+    const user = _safeGet('loggedUser', {});
+    const payload = { email: user.email || null, rating, comment: null };
+    try {
+        const res = await fetch(`/api/products/${productId}/rate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (res.ok) {
+            alert('Thanks for your rating!');
+            // refresh products to show updated avg
+            try {
+                const pr = await fetch('/api/products');
+                if (pr.ok) {
+                    const serverProducts = await pr.json();
+                    menuData = serverProducts;
+                    renderMenu();
+                }
+            } catch (e) { console.warn('Could not refresh products after rating', e); }
+        } else {
+            alert('Failed to submit rating.');
+        }
+    } catch (err) {
+        console.error('Rating failed', err);
+        alert('Network error while submitting rating.');
+    }
+}
+
+// --- Helper functions for search & orders ---
 function handleSearch() {
-    const q = (searchInput.value || '').trim().toLowerCase();
-    if (!q) {
-        renderMenu(); // show all when query is empty
-        return;
+    const q = (searchInput.value || '').toLowerCase().trim();
+    let filtered = menuData || [];
+    if (q) {
+        filtered = filtered.filter(i => (i.name || '').toLowerCase().includes(q) || (i.description||'').toLowerCase().includes(q));
     }
-    const filtered = menuData.filter(item =>
-        item.name.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q)
-    );
-    if (filtered.length === 0) {
-        menuGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#a4a4a4;">No results found for "' + q + '"</p>';
-    } else {
-        renderMenu(filtered);
+    if (selectedCategory) {
+        filtered = filtered.filter(i => (i.category || '') === selectedCategory);
     }
+    renderMenu(filtered);
 }
 
-// Wire search events
-searchBtn.addEventListener('click', handleSearch);
-searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleSearch();
+searchBtn?.addEventListener('click', handleSearch);
+searchInput?.addEventListener('input', () => { if (!searchInput.value) renderMenu(); });
+
+// Add click logic to category icons for filtering
+document.querySelectorAll('.cat-icon').forEach(icon => {
+    icon.addEventListener('click', () => {
+        const category = icon.title; // Get category from title attribute
+        selectedCategory = category === 'All' ? '' : category;
+        handleSearch();
+    });
 });
 
-// Add to Order
-function addToOrder(itemId) {
-    const item = menuData.find(i => i.id === itemId);
-    const existingItem = orderItems.find(i => i.id === itemId);
-    
-    if (existingItem) {
-        existingItem.quantity++;
-    } else {
-        orderItems.push({ ...item, quantity: 1 });
-    }
-    
+function addToOrder(id) {
+    const key = String(id);
+    const item = (menuData || []).find(i => String(i.id) === key || String(i._id) === key);
+    if (!item) return alert('Item not found');
+
+    const existing = orderItems.find(o => String(o.id) === key);
+    if (existing) existing.quantity += 1;
+    else orderItems.push({ id: item.id || item._id, name: item.name, price: Number(item.price || 0), quantity: 1, image: item.image_url || item.image });
+
     renderOrderItems();
     updateOrderSummary();
 }
 
-// Render Order Items
 function renderOrderItems() {
-    if (orderItems.length === 0) {
+    if (!orderItems || orderItems.length === 0) {
         orderItemsContainer.innerHTML = '<div class="empty-order"><p>No items in order</p></div>';
         placeOrderBtn.disabled = true;
         return;
     }
-    
     placeOrderBtn.disabled = false;
-    
-    orderItemsContainer.innerHTML = orderItems.map(item => `
+    orderItemsContainer.innerHTML = orderItems.map(it => `
         <div class="order-item">
-            <img src="${item.image}" alt="${item.name}" class="order-item-image">
+            <img src="${it.image || '../assets/default.jpg'}" class="order-item-image">
             <div class="order-item-details">
-                <div class="order-item-name">${item.name}</div>
-                <div class="order-item-price">₹${item.price.toFixed(2)}</div>
+                <div class="order-item-name">${it.name}</div>
+                <div class="order-item-price">₹${Number(it.price).toFixed(2)}</div>
                 <div class="order-item-controls">
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">−</button>
-                    <span class="quantity-display">${item.quantity}</span>
-                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                    <button class="remove-item-btn" onclick="removeFromOrder(${item.id})">×</button>
+                    <button class="quantity-btn" onclick="updateQuantity('${it.id}', -1)">-</button>
+                    <div class="quantity-display">${it.quantity}</div>
+                    <button class="quantity-btn" onclick="updateQuantity('${it.id}', 1)">+</button>
                 </div>
             </div>
+            <button class="remove-item-btn" onclick="removeItem('${it.id}')">×</button>
         </div>
     `).join('');
 }
 
-// Update Quantity
-function updateQuantity(itemId, delta) {
-    const item = orderItems.find(i => i.id === itemId);
-    if (item) {
-        item.quantity += delta;
-        if (item.quantity <= 0) {
-            removeFromOrder(itemId);
-        } else {
-            renderOrderItems();
-            updateOrderSummary();
-        }
-    }
-}
-
-// Remove from Order
-function removeFromOrder(itemId) {
-    orderItems = orderItems.filter(i => i.id !== itemId);
+function updateQuantity(id, delta) {
+    const it = orderItems.find(x => String(x.id) === String(id));
+    if (!it) return;
+    it.quantity = Math.max(0, (it.quantity || 0) + delta);
+    if (it.quantity === 0) orderItems = orderItems.filter(x => String(x.id) !== String(id));
     renderOrderItems();
     updateOrderSummary();
 }
 
-// Update Order Summary
-function updateOrderSummary() {
-    const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.08; // 8% tax
-    const charges = 5.00; // Fixed charges
-    const total = subtotal + tax + charges;
-    
-    document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
-    document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
-    document.getElementById('charges').textContent = `₹${charges.toFixed(2)}`;
-    document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+function removeItem(id) {
+    orderItems = orderItems.filter(x => String(x.id) !== String(id));
+    renderOrderItems();
+    updateOrderSummary();
 }
 
-// Place Order: save current order and redirect to billing page
+function updateOrderSummary() {
+    const subtotal = orderItems.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0);
+    const tax = +(subtotal * 0.08).toFixed(2);
+    const charges = 5.00;
+    const total = +(subtotal + tax + charges).toFixed(2);
+    document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
+    document.getElementById('tax').textContent = '₹' + tax.toFixed(2);
+    document.getElementById('charges').textContent = '₹' + charges.toFixed(2);
+    document.getElementById('total').textContent = '₹' + total.toFixed(2);
+}
+
 placeOrderBtn.addEventListener('click', () => {
     if (orderItems.length === 0) return alert('No items in order');
 
-    const user = JSON.parse(localStorage.getItem('loggedUser') || 'null');
-    // find latest table booking for this user
-    let tableNumber = null;
-    try {
-        const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-        const userBookings = user ? allBookings.filter(b => b.email === (user.email || '')) : [];
-        if (userBookings.length > 0) tableNumber = userBookings[userBookings.length - 1].tableNumber;
-    } catch (e) { tableNumber = null; }
-
+    const user = _safeGet('loggedUser', {});
     const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = +(subtotal * 0.08).toFixed(2);
     const charges = 5.00;
     const total = +(subtotal + tax + charges).toFixed(2);
 
-    // If a currentOrder already exists, merge new quantities into it rather than creating separate orders
-    const existingOrder = JSON.parse(localStorage.getItem('currentOrder') || 'null');
+    const existingOrder = _safeGet('currentOrder', null);
     let order = existingOrder;
     if (!order) {
         order = {
             id: 'ORD-' + Date.now(),
             user: user || null,
-            tableNumber: tableNumber || null,
+            tableNumber: currentTableNumber,
             items: [],
             subtotal, tax, charges, total,
             createdAt: new Date().toISOString(),
@@ -816,71 +1481,25 @@ placeOrderBtn.addEventListener('click', () => {
         };
     }
 
-    // merge orderItems into order.items
     order.items = order.items || [];
     orderItems.forEach(i => {
         const existing = order.items.find(x => x.id === i.id);
-        if (existing) {
-            existing.qty = (existing.qty || 0) + (i.quantity || i.qty || 0);
-        } else {
-            order.items.push({ id: i.id, name: i.name, price: i.price, qty: i.quantity || i.qty || 0, image: i.image });
-        }
+        if (existing) { existing.qty = (existing.qty || 0) + i.quantity; } 
+        else { order.items.push({ id: i.id, name: i.name, price: i.price, qty: i.quantity, image: i.image }); }
     });
 
-    // recalc totals
-    const newSubtotal = order.items.reduce((s, it) => s + (it.price * (it.qty || it.quantity || 0)), 0);
-    order.subtotal = +newSubtotal.toFixed(2);
-    order.tax = +((order.subtotal * 0.08).toFixed(2));
-    order.charges = 5.00;
-    order.total = +((order.subtotal + order.tax + order.charges).toFixed(2));
-    order.createdAt = order.createdAt || new Date().toISOString();
-    order.status = order.status || 'pending';
-
-    // save as currentOrder and append/replace in orders list
     localStorage.setItem('currentOrder', JSON.stringify(order));
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const idx = orders.findIndex(o => o.id === order.id);
-    if (idx === -1) orders.push(order); else orders[idx] = order;
-    localStorage.setItem('orders', JSON.stringify(orders));
-
-    // clear UI order but keep stored order so user can continue adding later
     orderItems = [];
     renderOrderItems();
     updateOrderSummary();
-
-    // redirect to billing page
     setTimeout(() => { window.location.href = 'billing.html'; }, 300);
 });
 
-// Navigation
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-    });
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("loggedUser");
+    window.location.href = "login.html";
 });
 
-// Initialize app
 init();
-
-// Listen for storage events so other tabs/pages can react when payment clears the currentOrder
-window.addEventListener('storage', (e) => {
-    if (e.key === 'currentOrder' && e.newValue === null) {
-        // current order removed -> clear UI
-        orderItems = [];
-        renderOrderItems();
-        updateOrderSummary();
-    }
-    if (e.key === 'order_cleared_at') {
-        // order was cleared elsewhere (payment). Clear UI too.
-        orderItems = [];
-        renderOrderItems();
-        updateOrderSummary();
-    }
-    if (e.key === 'booking_cleared_at') {
-        // booking removed elsewhere (payment). You may want to refresh booking-related UI; for now clear table display
-        const tableDisplay = document.getElementById('tableNumberDisplay');
-        if (tableDisplay) tableDisplay.textContent = 'Table: -';
-    }
-});
 </script>

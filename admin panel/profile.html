@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Profiles | SaffronSky Admin</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body>
+    <div class="profile-page-container">
+        <header class="page-header">
+            <div class="header-row">
+                <div class="brand-logo">SeffronSky</div>
+                <h2 class="page-title">Database Management</h2>
+                <a class="back-btn" href="index.html" aria-label="Back to dashboard">Back</a>
+            </div>
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="switchTab('usersTab')">Registered Users</button>
+                <button class="tab-btn" onclick="switchTab('feedbackTab')">Customer Feedback</button>
+                <button class="tab-btn" onclick="switchTab('bookingsTab')">Table Bookings</button>
+                <button class="tab-btn" onclick="switchTab('billingTab')">Billing</button>
+            </div>
+        </header>
+
+        <div id="usersTab" class="db-section">
+            <div class="table-card">
+                <h3>Registered Accounts</h3>
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="feedbackTab" class="db-section" style="display:none">
+            <div class="table-card">
+                <h3>Customer Feedback</h3>
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Food Rating</th>
+                            <th>Service</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedbackList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="bookingsTab" class="db-section" style="display:none">
+            <div class="table-card">
+                <h3>Table Reservations</h3>
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Table #</th>
+                            <th>Guests</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="billingTab" class="db-section" style="display:none">
+            <div class="table-card">
+                <h3>Order & Payment History</h3>
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Email</th>
+                            <th>Items Ordered</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billingList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-logic.js"></script>
+</body>
+</html>

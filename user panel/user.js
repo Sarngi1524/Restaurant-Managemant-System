@@ -16,6 +16,15 @@ document.addEventListener('DOMContentLoaded', function () {
   const showLoginFromForgot = document.getElementById('showLoginFromForgot');
   const backToLogin = document.getElementById('backToLogin');
 
+  // Debug: detect presence/visibility of the role selection UI
+  const roleSelect = document.querySelector('.role-select');
+  if (roleSelect) {
+    // Will appear in browser console after page load - helps check if element is present and visible
+    console.log('role-select found:', roleSelect, 'computed display:', window.getComputedStyle(roleSelect).display);
+  } else {
+    console.log('role-select NOT found in DOM');
+  }
+
   function switchForm(form) {
     [loginForm, registerForm, forgotForm, resetForm].forEach((f) => f && f.classList.add('hidden'));
     const target = document.getElementById(form + 'Form');
@@ -31,115 +40,165 @@ document.addEventListener('DOMContentLoaded', function () {
   if (backToLogin) backToLogin.addEventListener('click', () => switchForm('login'));
 
   // Register User
-  if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('regName')?.value.trim() || '';
-      const email = document.getElementById('regEmail')?.value.trim() || '';
-      const password = document.getElementById('regPassword')?.value || '';
-      const confirm = document.getElementById('regConfirm')?.value || '';
+ if (registerForm) {
+  registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      if (password !== confirm) {
-        if (registerMsg) { registerMsg.textContent = 'Passwords do not match!'; registerMsg.className = 'message error'; }
-        return;
+    const name = document.getElementById('regName')?.value.trim() || '';
+    const email = document.getElementById('regEmail')?.value.trim() || '';
+    const password = document.getElementById('regPassword')?.value || '';
+    const confirm = document.getElementById('regConfirm')?.value || '';
+
+    if (password !== confirm) {
+      if (registerMsg) {
+        registerMsg.textContent = 'Passwords do not match!';
+        registerMsg.className = 'message error';
       }
+      return;
+    }
 
-      const user = { name, email, password };
-      localStorage.setItem('user', JSON.stringify(user));
-      if (registerMsg) { registerMsg.textContent = 'Registration successful! You can now log in.'; registerMsg.className = 'message success'; }
-      setTimeout(() => switchForm('login'), 1200);
-    });
-  }
-
-  // Login User (redirect to booking.html)
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail')?.value.trim() || '';
-      const password = document.getElementById('loginPassword')?.value || '';
-      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-
-      if (!storedUser) {
-        if (loginMsg) { loginMsg.textContent = 'No account found. Please register first.'; loginMsg.className = 'message error'; }
-        return;
-      }
-
-      if (storedUser.email === email && storedUser.password === password) {
-        if (loginMsg) { loginMsg.textContent = 'Login successful! Welcome ' + storedUser.name + '....'; loginMsg.className = 'message success'; }
-        // mark as logged in and save user for other pages
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('loggedUser', JSON.stringify(storedUser));
-
-        // navigate to booking.html after short delay
-        setTimeout(() => { window.location.href = 'booking.html'; }, 700);
+    fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        registerMsg.textContent = "Registration successful! You can now log in.";
+        registerMsg.className = "message success";
+        setTimeout(() => switchForm("login"), 1200);
       } else {
-        if (loginMsg) { loginMsg.textContent = 'Invalid email or password!'; loginMsg.className = 'message error'; }
+        registerMsg.textContent = data.message || "Registration failed. Try again.";
+        registerMsg.className = "message error";
       }
     });
-  }
 
+  });  
+} 
+
+  // Login User (redirect to booking.html or admin dashboard)
+  if (loginForm) {
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // Check if already logged in
+    const currentUser = localStorage.getItem("loggedUser");
+    if (currentUser && !window.sessionLoginSwitchPrompted) {
+      const confirmed = window.confirm("You are already logged in. Do you want to login with a different account?");
+      if (!confirmed) {
+        return;
+      }
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("isAdmin");
+      window.sessionLoginSwitchPrompted = true;
+    }
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const selectedRole = document.querySelector("input[name='role']:checked").value;
+
+    fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, requestedRole: selectedRole })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+
+      if (data.success) {
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("loggedUser", JSON.stringify(data.user));
+
+        if (data.user.role === "admin") {
+          localStorage.setItem("isAdmin", "true");
+          // redirect to the admin area index page served at /admin/
+          // server maps "/admin" -> the "admin panel" folder, so use /admin/index.html
+          window.location.href = "/admin/index.html";
+        } else {
+          localStorage.removeItem("isAdmin");
+          window.location.href = "booking.html";
+        }
+
+      } else {
+        loginMsg.textContent = data.message || "Invalid email or password!";
+        loginMsg.className = "message error";
+      }
+
+    })
+    .catch(err => {
+      console.error('Login request failed:', err);
+      if (loginMsg) {
+        loginMsg.textContent = "Unable to contact server. Please try again later.";
+        loginMsg.className = "message error";
+      }
+    });
+  });
+}
   // Forgot Password (verify email -> store resetEmail and switch to reset)
-  if (forgotForm) {
-    forgotForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('forgotEmail')?.value.trim() || '';
-      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-      if (!storedUser || storedUser.email !== email) {
-        if (forgotMsg) { forgotMsg.textContent = 'Email not found!'; forgotMsg.className = 'message error'; }
-        return;
-      }
-      localStorage.setItem('resetEmail', email);
-      if (forgotMsg) { forgotMsg.textContent = 'Verification successful. Please enter new password.'; forgotMsg.className = 'message success'; }
-      // reveal reset inputs if inline, otherwise switch to reset form
-      const resetSection = document.getElementById('resetSection');
-      if (resetSection) {
-        resetSection.classList.remove('hidden');
-        const forgotBtn = document.getElementById('forgotBtn'); 
-        if (forgotBtn) forgotBtn.textContent = 'Reset Password';
-        forgotForm.dataset.stage = 'reset';
-        return;
-      }
-      // fallback: try to switch to resetForm if available
-      if (resetForm) switchForm('reset');
-    });
-  }
+ if (forgotForm) {
+  forgotForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-  // Handle inline forgotForm reset stage
-  if (forgotForm) {
-    forgotForm.addEventListener('submit', (e) => {
-      if (forgotForm.dataset.stage !== 'reset') return; // only when in reset stage
-      e.preventDefault();
-      const email = localStorage.getItem('resetEmail') || document.getElementById('forgotEmail')?.value.trim();
-      const newPass = document.getElementById('newPassword')?.value || '';
-      const confirmPass = document.getElementById('confirmPassword')?.value || '';
-      if (!email) { if (forgotMsg) { forgotMsg.textContent = 'No reset request found.'; forgotMsg.className = 'message error'; } return; }
-      if (!newPass || !confirmPass) { if (forgotMsg) { forgotMsg.textContent = 'Please fill both password fields.'; forgotMsg.className = 'message error'; } return; }
-      if (newPass !== confirmPass) { if (forgotMsg) { forgotMsg.textContent = 'Passwords do not match.'; forgotMsg.className = 'message error'; } return; }
-      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-      if (!storedUser || storedUser.email !== email) { if (forgotMsg) { forgotMsg.textContent = 'Account not found.'; forgotMsg.className = 'message error'; } return; }
-      storedUser.password = newPass; localStorage.setItem('user', JSON.stringify(storedUser));
-      const logged = JSON.parse(localStorage.getItem('loggedUser') || 'null'); if (logged && logged.email === storedUser.email) { logged.password = newPass; localStorage.setItem('loggedUser', JSON.stringify(logged)); }
-      localStorage.removeItem('resetEmail'); if (forgotMsg) { forgotMsg.textContent = 'Password updated. Redirecting to login...'; forgotMsg.className = 'message success'; }
-      setTimeout(() => switchForm('login'), 900);
-    });
-  }
+    const email = document.getElementById('forgotEmail').value.trim();
 
-  // Reset form handler (separate reset form)
-  if (resetForm) {
-    resetForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const targetEmail = localStorage.getItem('resetEmail') || (JSON.parse(localStorage.getItem('user') || 'null') || {}).email;
-      const newPass = document.getElementById('newPass')?.value || '';
-      const confirmNewPass = document.getElementById('confirmNewPass')?.value || '';
-      if (!targetEmail) { if (resetMsg) { resetMsg.textContent = 'No email available to reset. Use "Forgot Password" first.'; resetMsg.className = 'message error'; } return; }
-      if (!newPass || !confirmNewPass) { if (resetMsg) { resetMsg.textContent = 'Please fill both fields.'; resetMsg.className = 'message error'; } return; }
-      if (newPass !== confirmNewPass) { if (resetMsg) { resetMsg.textContent = 'Passwords do not match.'; resetMsg.className = 'message error'; } return; }
-      const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-      if (!storedUser || storedUser.email !== targetEmail) { if (resetMsg) { resetMsg.textContent = 'Account not found for ' + targetEmail; resetMsg.className = 'message error'; } return; }
-      storedUser.password = newPass; localStorage.setItem('user', JSON.stringify(storedUser));
-      const loggedUser = JSON.parse(localStorage.getItem('loggedUser') || 'null'); if (loggedUser && loggedUser.email === targetEmail) { loggedUser.password = newPass; localStorage.setItem('loggedUser', JSON.stringify(loggedUser)); }
-      localStorage.removeItem('resetEmail'); if (resetMsg) { resetMsg.textContent = 'Password reset successful. Redirecting to login...'; resetMsg.className = 'message success'; }
-      setTimeout(() => switchForm('login'), 900);
+    if (!email) {
+      forgotMsg.textContent = "Please enter your email.";
+      forgotMsg.className = "message error";
+      return;
+    }
+
+    // Store email temporarily
+    localStorage.setItem("resetEmail", email);
+
+    // Move to reset form
+    switchForm("reset");
+  });
+}
+if (resetForm) {
+  resetForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const email = localStorage.getItem("resetEmail");
+    const newPass = document.getElementById('newPass').value;
+    const confirmPass = document.getElementById('confirmNewPass').value;
+
+    if (!newPass || !confirmPass) {
+      resetMsg.textContent = "Please fill both fields.";
+      resetMsg.className = "message error";
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      resetMsg.textContent = "Passwords do not match.";
+      resetMsg.className = "message error";
+      return;
+    }
+
+    fetch("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, newPassword: newPass })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        resetMsg.textContent = "Password updated successfully!";
+        resetMsg.className = "message success";
+
+        localStorage.removeItem("resetEmail");
+
+        setTimeout(() => switchForm("login"), 1000);
+      } else {
+        resetMsg.textContent = data.message;
+        resetMsg.className = "message error";
+      }
     });
-  }
+  });
+}
 });

@@ -7,16 +7,22 @@
   <style>
     :root{
         --bg:#fff4f6;
-        --accent :#ff6600;
+        --accent:#ff6600;
         --muted:#666
     }
+
+    * {
+        box-sizing: border-box;
+    }
+
     html,body{
         height:100%;
         margin:0;
-         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-   
-        
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        width: 100%;
+        overflow-x: hidden;
     }
+
     body{
         font-family:Arial,Helvetica,sans-serif;
         background:var(--bg);
@@ -27,20 +33,21 @@
     .page{
         min-height:100vh;
         display:flex;
-        flex-direction:column
+        flex-direction:column;
+        position: relative;
     }
+
     .header{
         padding:20px 28px; 
         border-bottom:1px solid #f2e6ea;
         background:#ffa76c7c;
     }
+
     /* brand corner label */
-    .page { position: relative; }
     .brand-corner{
       position: absolute;
-      right: 28px; /* align with header horizontal padding */
-      top: 20px;   /* align with header vertical padding */
-      
+      left: 28px;
+      top: 20px;
       color: var(--accent);
       padding: 6px 10px;
       border-radius: 6px;
@@ -48,133 +55,563 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       z-index: 50;
       font-size:0.9rem;
+      transition: all 0.3s ease;
     }
+
     .header h1{
         margin:0;
         color:var(--accent);
-        font-size:1.4rem
-    }
-    .meta{
-        margin-top:6px;
-        color:var(--muted);
-        font-size:0.95rem
+        font-size:1.4rem;
+        font-weight: 700;
     }
 
-  .content{
-    flex:1;
-    display:block;
-    padding:12px 20px;
-    overflow:hidden
-}
-  .items-panel{
-    width:100%;
-    background:#fff;
-    border-radius:12px;
-    /* add extra left padding so images aren't flush to the edge */
-    padding:12px 14px 12px 28px;
-    overflow:auto;
-    box-shadow:0 6px 20px rgba(0,0,0,0.04)
-}
-  table{
-    width:100%;
-    border-collapse:collapse
-}
-    th,td{
-        padding:10px;
-        border-bottom:1px solid #f6e8ec;
-        text-align:left}
-    .item-name{
-        font-weight:600
+    .meta{
+        margin-top:8px;
+        color:var(--muted);
+        font-size:0.95rem;
+        word-wrap: break-word;
     }
-  .item-thumb{
-    width:56px;
-    height:44px;
-    object-fit:cover;
-    border-radius:8px;
-    margin-right:10px;
-    display:inline-block;
-    vertical-align:middle;
-  }
-  /* ensure first table cell keeps space from the very left edge */
-  .items-panel table td:first-child,
-  .items-panel table th:first-child {
-    padding-left:8px;
-  }
-  .item-cell{display:flex;align-items:center;gap:8px}
+
+    .content{
+        flex:1;
+        display:block;
+        padding:12px 20px;
+        overflow:auto;
+    }
+
+    .items-panel{
+        width:100%;
+        background:#fff;
+        border-radius:12px;
+        padding:12px 14px 12px 28px;
+        overflow:auto;
+        box-shadow:0 6px 20px rgba(0,0,0,0.04);
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    th,td{
+        padding:12px 10px;
+        border-bottom:1px solid #f6e8ec;
+        text-align:left;
+        word-wrap: break-word;
+    }
+
+    th {
+        background: #fafafa;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .item-name{
+        font-weight:600;
+        color: #2d3748;
+    }
+
+    .item-thumb{
+        width:56px;
+        height:44px;
+        object-fit:cover;
+        border-radius:8px;
+        margin-right:10px;
+        display:inline-block;
+        vertical-align:middle;
+        flex-shrink: 0;
+    }
+
+    /* ensure first table cell keeps space from the very left edge */
+    .items-panel table td:first-child,
+    .items-panel table th:first-child {
+        padding-left:8px;
+    }
+
+    .item-cell{
+        display:flex;
+        align-items:center;
+        gap:8px;
+    }
+
     .line{
         font-weight:600;
-        color:var(--accent)
+        color:var(--accent);
     }
 
-  /* summary moved into bottom action bar */
-  .summary-row{
-    display:flex;
-    justify-content:space-between;
-    padding:8px 0;
-    color:#666
-}
-  .summary-row.total{
-    font-size:1.15rem;
-    font-weight:700;
-    color:#222
-}
+    /* summary moved into bottom action bar */
+    .summary-row{
+        display:flex;
+        justify-content:space-between;
+        padding:8px 0;
+        color:#666;
+    }
+
+    .summary-row.total{
+        font-size:1.15rem;
+        font-weight:700;
+        color:#222;
+    }
 
     /* sticky bottom action bar */
-  .action-bar{
-    position:sticky;
-    bottom:0;
-    background:linear-gradient(180deg,#ffffff00,#ffffff);
-    padding:14px 20px;
-    display:flex;
-    justify-content:center;
-    align-items:center
-}
-  .action-inner{
-    max-width:1180px;
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:center
-}
-  .details{
-    display:flex;
-    flex-direction:column;
-    gap:6px
-}
-  .details div{
-    font-size:0.95rem;
-    color:#666
-}
-  .pay-btn{
-    background:var(--accent);
-    color:#fff;
-    padding:12px 18px;
-    border:none;
-    border-radius:10px;
-    font-weight:700;
-    cursor:pointer
-}
-  .back-btn{
-    background:transparent;
-    border:1px solid var(--accent);
-    color:var(--accent);
-    padding:10px 14px;
-    border-radius:10px;
-    cursor:pointer
-}
+    .action-bar{
+        position:sticky;
+        bottom:0;
+        background:linear-gradient(180deg,#ffffff00,#ffffff);
+        padding:14px 20px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
 
-    @media (max-width:900px){
-      .content{padding:10px}
-      .action-inner{flex-direction:column;align-items:stretch}
+    .action-inner{
+        max-width:1180px;
+        width:100%;
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        align-items:center;
+        flex-wrap: wrap;
     }
-    /* responsive tweaks for brand label */
-    @media (max-width:900px) {
-      .brand-corner{ right: 20px; top: 16px; font-size:0.85rem; padding:5px 8px; }
+
+    .details{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
     }
-    @media (max-width:480px) {
-      /* move label inside header space on very small screens */
-      .brand-corner{ right: 16px; top: 12px; font-size:0.8rem; padding:4px 7px; }
+
+    .details div{
+        font-size:0.95rem;
+        color:#666;
+    }
+
+    .details strong {
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .pay-btn{
+        background:var(--accent);
+        color:#fff;
+        padding:12px 18px;
+        border:none;
+        border-radius:10px;
+        font-weight:700;
+        cursor:pointer;
+        transition: background 0.3s ease;
+        white-space: nowrap;
+        min-width: 120px;
+    }
+
+    .pay-btn:hover {
+        background: #e55a2b;
+    }
+
+    .pay-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .back-btn{
+        background:transparent;
+        border:1px solid var(--accent);
+        color:var(--accent);
+        padding:10px 14px;
+        border-radius:10px;
+        cursor:pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        min-width: 120px;
+    }
+
+    .back-btn:hover {
+        background: var(--accent);
+        color: white;
+    }
+
+    #payMsg {
+        margin:10px 28px 28px 28px;
+        color:#2d3748;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .header {
+            padding: 18px 24px;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+        }
+
+        .brand-corner {
+            left: 24px;
+            top: 16px;
+        }
+
+        .items-panel {
+            padding: 12px 12px 12px 20px;
+        }
+
+        .content {
+            padding: 10px 16px;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            font-size: 0.95rem;
+        }
+
+        .item-thumb {
+            width: 50px;
+            height: 40px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .header {
+            padding: 16px 20px;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+        }
+
+        .brand-corner {
+            left: 20px;
+            top: 14px;
+            font-size: 0.85rem;
+        }
+
+        .meta {
+            font-size: 0.9rem;
+        }
+
+        .items-panel {
+            padding: 10px 10px 10px 18px;
+        }
+
+        th, td {
+            padding: 9px 7px;
+            font-size: 0.9rem;
+        }
+
+        .action-inner {
+            gap: 10px;
+        }
+
+        .details div {
+            font-size: 0.9rem;
+        }
+
+        .pay-btn, .back-btn {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .content {
+            padding: 10px;
+        }
+
+        .header {
+            padding: 14px 16px;
+        }
+
+        .brand-corner {
+            left: 16px;
+            top: 12px;
+            font-size: 0.8rem;
+            padding: 5px 8px;
+        }
+
+        .action-inner {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .details {
+            width: 100%;
+            gap: 5px;
+        }
+
+        .details div {
+            font-size: 0.9rem;
+        }
+
+        .pay-btn, .back-btn {
+            width: 100%;
+            padding: 11px 12px;
+            font-size: 0.95rem;
+        }
+
+        .items-panel {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 500px;
+        }
+
+        th, td {
+            padding: 8px 6px;
+            font-size: 0.85rem;
+        }
+
+        .item-thumb {
+            width: 45px;
+            height: 35px;
+            margin-right: 8px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        html {
+            font-size: 14px;
+        }
+
+        body {
+            background: var(--bg);
+        }
+
+        .header {
+            padding: 12px 14px;
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+
+        .brand-corner {
+            left: 12px;
+            top: 10px;
+            font-size: 0.75rem;
+            padding: 4px 6px;
+        }
+
+        .meta {
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .content {
+            padding: 8px 12px;
+            flex: 1;
+        }
+
+        .items-panel {
+            padding: 8px 10px 8px 16px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 7px 5px;
+            font-size: 0.8rem;
+        }
+
+        th {
+            font-size: 0.75rem;
+        }
+
+        .item-name {
+            font-size: 0.85rem;
+        }
+
+        .item-thumb {
+            width: 40px;
+            height: 32px;
+            margin-right: 6px;
+        }
+
+        .action-bar {
+            padding: 10px 12px;
+        }
+
+        .action-inner {
+            gap: 8px;
+        }
+
+        .details {
+            gap: 4px;
+        }
+
+        .details div {
+            font-size: 0.8rem;
+        }
+
+        .pay-btn, .back-btn {
+            padding: 9px 10px;
+            font-size: 0.85rem;
+            min-width: 100px;
+        }
+
+        #payMsg {
+            margin: 8px 14px 14px 14px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        html {
+            font-size: 13px;
+        }
+
+        .header {
+            padding: 10px 12px;
+        }
+
+        .header h1 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .brand-corner {
+            left: 8px;
+            top: 8px;
+            font-size: 0.7rem;
+            padding: 3px 5px;
+        }
+
+        .meta {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .content {
+            padding: 6px 10px;
+        }
+
+        .items-panel {
+            padding: 6px 8px 6px 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 400px;
+            font-size: 0.75rem;
+        }
+
+        th, td {
+            padding: 6px 4px;
+            font-size: 0.7rem;
+        }
+
+        th {
+            font-size: 0.65rem;
+        }
+
+        .item-cell {
+            gap: 6px;
+        }
+
+        .item-thumb {
+            width: 35px;
+            height: 28px;
+            margin-right: 4px;
+        }
+
+        .item-name {
+            font-size: 0.75rem;
+        }
+
+        .action-bar {
+            padding: 8px 10px;
+        }
+
+        .action-inner {
+            gap: 6px;
+            flex-direction: column;
+        }
+
+        .details {
+            width: 100%;
+            gap: 3px;
+        }
+
+        .details div {
+            font-size: 0.7rem;
+        }
+
+        .pay-btn, .back-btn {
+            padding: 8px 8px;
+            font-size: 0.75rem;
+            width: 100%;
+            min-width: auto;
+        }
+
+        #payMsg {
+            margin: 6px 10px 10px 10px;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        html {
+            font-size: 12px;
+        }
+
+        .header {
+            padding: 8px 10px;
+        }
+
+        .header h1 {
+            font-size: 0.95rem;
+        }
+
+        .brand-corner {
+            left: 6px;
+            top: 6px;
+            font-size: 0.65rem;
+            padding: 2px 4px;
+        }
+
+        .meta {
+            font-size: 0.7rem;
+        }
+
+        .content {
+            padding: 4px 8px;
+        }
+
+        .items-panel {
+            padding: 4px 6px 4px 12px;
+        }
+
+        table {
+            min-width: 350px;
+            font-size: 0.7rem;
+        }
+
+        th, td {
+            padding: 5px 3px;
+            font-size: 0.65rem;
+        }
+
+        .item-thumb {
+            width: 30px;
+            height: 24px;
+        }
+
+        .pay-btn, .back-btn {
+            padding: 7px 6px;
+            font-size: 0.7rem;
+        }
+
+        #payMsg {
+            margin: 4px 8px 8px 8px;
+            font-size: 0.7rem;
+        }
     }
   </style>
 </head>
@@ -216,93 +653,96 @@
   </div>
 
   <script>
-    (function(){
-      const order = JSON.parse(localStorage.getItem('currentOrder') || 'null');
-      if (!order) {
+   (function() {
+    // 1. Get current order from localStorage (Temporary UI State)
+    const order = JSON.parse(localStorage.getItem('currentOrder') || 'null');
+    
+    if (!order) {
         alert('No order found. Redirecting to menu.');
         window.location.href = 'Menu.html';
         return;
-      }
+    }
 
-  // build metadata: order id, table, customer name/email (if present), created time
-  const metaParts = [];
-  metaParts.push(`Order: ${order.id}`);
-  if (order.tableNumber) metaParts.push(`Table: ${order.tableNumber}`);
-  if (order.user && order.user.name) metaParts.push(`Customer: ${order.user.name}`);
-  else if (order.user && order.user.email) metaParts.push(`Customer: ${order.user.email}`);
-  metaParts.push(`Created: ${new Date(order.createdAt).toLocaleString()}`);
-  document.getElementById('orderMeta').textContent = metaParts.join(' | ');
+    // 2. Build metadata display
+    const metaParts = [];
+    metaParts.push(`Order: ${order.id}`);
+    if (order.tableNumber) metaParts.push(`Table: ${order.tableNumber}`);
+    if (order.user && order.user.name) metaParts.push(`Customer: ${order.user.name}`);
+    else if (order.user && order.user.email) metaParts.push(`Customer: ${order.user.email}`);
+    metaParts.push(`Created: ${new Date(order.createdAt).toLocaleString()}`);
+    document.getElementById('orderMeta').textContent = metaParts.join(' | ');
 
-      const tbody = document.querySelector('#itemsTable tbody');
-      order.items.forEach(it => {
+    // 3. Render items in table
+    const tbody = document.querySelector('#itemsTable tbody');
+    order.items.forEach(it => {
         const tr = document.createElement('tr');
         const imgHtml = it.image ? `<img src="${it.image}" alt="${it.name}" class="item-thumb">` : '';
-        tr.innerHTML = `<td class="item-cell">${imgHtml}<span class="item-name">${it.name}</span></td><td>${it.qty}</td><td>₹${it.price.toFixed(2)}</td><td class="line">₹${(it.price*it.qty).toFixed(2)}</td>`;
+        tr.innerHTML = `
+            <td class="item-cell">${imgHtml}<span class="item-name">${it.name}</span></td>
+            <td>${it.qty}</td>
+            <td>₹${it.price.toFixed(2)}</td>
+            <td class="line">₹${(it.price * it.qty).toFixed(2)}</td>
+        `;
         tbody.appendChild(tr);
-      });
+    });
 
-  document.getElementById('subtotalCell').textContent = `₹${order.subtotal.toFixed(2)}`;
-  document.getElementById('taxCell').textContent = `₹${order.tax.toFixed(2)}`;
-  document.getElementById('chargesCell').textContent = `₹${order.charges.toFixed(2)}`;
-  document.getElementById('bottomTotal').textContent = `₹${order.total.toFixed(2)}`;
+    // 4. Update total displays
+    document.getElementById('subtotalCell').textContent = `₹${order.subtotal.toFixed(2)}`;
+    document.getElementById('taxCell').textContent = `₹${order.tax.toFixed(2)}`;
+    document.getElementById('chargesCell').textContent = `₹${order.charges.toFixed(2)}`;
+    document.getElementById('bottomTotal').textContent = `₹${order.total.toFixed(2)}`;
 
-      // Add-more button goes back to menu (keeps currentOrder)
-      document.getElementById('addMoreBtn')?.addEventListener('click', () => {
+    // 5. Navigation
+    document.getElementById('addMoreBtn')?.addEventListener('click', () => {
         window.location.href = 'Menu.html';
-      });
+    });
 
-      document.getElementById('payBtn').addEventListener('click', () => {
+    // 6. PAY NOW - Primary Database Logic
+    document.getElementById('payBtn').addEventListener('click', () => {
         const payMsg = document.getElementById('payMsg');
         const payBtn = document.getElementById('payBtn');
+        
         payMsg.textContent = 'Processing payment...';
         payBtn.disabled = true;
-        setTimeout(() => {
-          payMsg.textContent = 'Payment successful. Thank you!';
-          // mark order as paid in orders list
-          const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-          const idx = orders.findIndex(o => o.id === order.id);
-          if (idx !== -1) {
-            orders[idx].status = 'paid';
-            orders[idx].paidAt = new Date().toISOString();
-            localStorage.setItem('orders', JSON.stringify(orders));
-          }
 
-          // remove currentOrder and notify other pages by setting a timestamp flag
-          localStorage.removeItem('currentOrder');
-          try { localStorage.setItem('order_cleared_at', String(Date.now())); } catch (e) { /* ignore */ }
+        // Save order to MySQL Database
+        fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: order.user.email,
+                total: order.total,
+                status: "Paid",
+                items: (order.items || []).map(it => ({ productId: it.id, name: it.name, price: it.price, qty: it.qty }))
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            payMsg.textContent = 'Payment successful. Order saved!';
 
-          // Also cancel any active table booking associated with this order (same user email and tableNumber)
-          try {
-            if (order && order.user && order.user.email && order.tableNumber) {
-              const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-              const updated = allBookings.filter(b => !(b.email === order.user.email && String(b.tableNumber) === String(order.tableNumber)));
-              localStorage.setItem('bookings', JSON.stringify(updated));
-              try { localStorage.setItem('booking_cleared_at', String(Date.now())); } catch(e) {}
-            }
-          } catch (e) {
-            // ignore booking cleanup errors
-          }
+            // Remove current session data
+            localStorage.removeItem('currentOrder');
+            localStorage.removeItem('orders'); // Clear local orders array as we use DB now
+            
+            // Cleanup UI
+            document.querySelector('#itemsTable tbody').innerHTML = '';
+            ['subtotalCell', 'taxCell', 'chargesCell', 'bottomTotal'].forEach(id => {
+                document.getElementById(id).textContent = '₹0.00';
+            });
 
-          // clear billing UI immediately
-          document.querySelector('#itemsTable tbody').innerHTML = '';
-          document.getElementById('subtotalCell').textContent = '₹0.00';
-          document.getElementById('taxCell').textContent = '₹0.00';
-          document.getElementById('chargesCell').textContent = '₹0.00';
-          document.getElementById('bottomTotal').textContent = '₹0.00';
+            // Redirect flow
+            setTimeout(() => {
+                window.location.href = 'Order.html';
+            }, 1000);
+        })
+        .catch((err) => {
+            console.error("DB Save Error:", err);
+            payMsg.textContent = 'Payment processed but server sync failed.';
+            payBtn.disabled = false;
+        });
+    });
+})();
 
-          // redirect: show Order.html for 5 seconds, then go to Menu
-          setTimeout(() => {
-            try {
-              window.location.href = 'Order.html';
-            } catch (e) {
-              // fallback
-              window.location.href = 'Menu.html';
-            }
-            setTimeout(() => { window.location.href = 'index.html'; }, 5000);
-          }, 900);
-        }, 900);
-      });
-    })();
   </script>
 </body>
 </html>

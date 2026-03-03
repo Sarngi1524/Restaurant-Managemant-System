@@ -11,43 +11,43 @@
       box-sizing: border-box;
     }
 
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background:url('assets/food background.jpg') no-repeat center center/cover; 
+      background: url('assets/food background.jpg') no-repeat center center/cover;
+      padding: 20px;
     }
 
     .container {
       display: flex;
-      width: 900px;
-      max-width: 95%;
+      width: 100%;
+      max-width: 900px;
       box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
       border-radius: 15px;
       overflow: hidden;
+      position: relative;
     }
-    /* brand corner */
-    .container { position: relative; }
-    .brand-corner{
+
+    .brand-corner {
       position: absolute;
-      left: 12px;
-      top: 12px;
+      left: 24px;
+      top: 24px;
       color: #ff6600;
       padding: 6px 10px;
       border-radius: 6px;
-      font:weight 10px;
       z-index: 50;
+      font-weight: 700;
       font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
-      font-size:0.9rem;
-    }
-    /* responsive tweaks for brand label (login anchored left) */
-    @media (max-width:900px) {
-      .brand-corner{ left: 16px; top: 14px; font-size:0.85rem; padding:5px 8px; }
-    }
-    @media (max-width:480px) {
-      .brand-corner{ left: 12px; top: 10px; font-size:0.8rem; padding:4px 7px; }
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
     }
 
     .illustration {
@@ -56,12 +56,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 40px 20px;
+      min-height: 500px;
     }
 
     .illustration img {
       width: 100%;
       max-width: 400px;
+      object-fit: contain;
     }
 
     .form-box {
@@ -70,7 +72,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-       background: #ffa76c7c;
+      background: #ffa76c7c;
+      min-height: 500px;
     }
 
     h2 {
@@ -78,6 +81,7 @@
       margin-bottom: 15px;
       font-weight: 700;
       text-align: center;
+      color: #222;
     }
 
     p {
@@ -85,6 +89,7 @@
       color: #333;
       text-align: center;
       margin-bottom: 15px;
+      line-height: 1.4;
     }
 
     .input-group {
@@ -98,6 +103,14 @@
       border: 1px solid #ccc;
       outline: none;
       font-size: 15px;
+      background: #fff;
+      color: #222;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #ff6600;
+      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
     }
 
     .btn {
@@ -110,38 +123,531 @@
       border-radius: 8px;
       cursor: pointer;
       margin-bottom: 15px;
+      font-weight: 600;
+      transition: background 0.3s ease;
+      white-space: nowrap;
     }
+
     .btn:hover {
       background: #e65c00;
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
     }
 
     .toggle {
       text-align: center;
       font-size: 14px;
+      margin-bottom: 10px;
     }
 
     .toggle a {
       color: #ff6600;
       text-decoration: none;
       cursor: pointer;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .toggle a:hover {
+      color: #e65c00;
+      text-decoration: underline;
     }
 
     .message {
       text-align: center;
       margin-bottom: 10px;
       font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
     }
 
     .error {
-      color: red;
+      color: #d32f2f;
+      font-weight: 600;
     }
 
     .success {
-      color: green;
+      color: #388e3c;
+      font-weight: 600;
+    }
+
+    .role-select {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .role-select label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .role-select input {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
     }
 
     .hidden {
       display: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .container {
+        max-width: 850px;
+      }
+
+      .brand-corner {
+        left: 22px;
+        top: 22px;
+      }
+
+      .illustration {
+        padding: 35px 18px;
+        min-height: 450px;
+      }
+
+      .form-box {
+        padding: 35px;
+        min-height: 450px;
+      }
+
+      h2 {
+        font-size: 24px;
+        margin-bottom: 12px;
+      }
+
+      p {
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+
+      .input-group input {
+        padding: 11px;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 11px;
+        font-size: 15px;
+      }
+
+      .toggle {
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .role-select {
+        gap: 10px;
+        margin-bottom: 12px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        max-width: 800px;
+      }
+
+      .brand-corner {
+        left: 20px;
+        top: 20px;
+        font-size: 0.85rem;
+        padding: 5px 8px;
+      }
+
+      .illustration {
+        padding: 30px 16px;
+        min-height: 400px;
+      }
+
+      .illustration img {
+        max-width: 350px;
+      }
+
+      .form-box {
+        padding: 30px;
+        min-height: 400px;
+      }
+
+      h2 {
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+
+      p {
+        font-size: 13px;
+      }
+
+      .input-group {
+        margin-bottom: 12px;
+      }
+
+      .input-group input {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .role-select {
+        gap: 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      .container {
+        flex-direction: column;
+        max-width: 100%;
+      }
+
+      .brand-corner {
+        left: 16px;
+        top: 16px;
+        font-size: 0.8rem;
+        padding: 5px 8px;
+      }
+
+      .illustration {
+        flex: 0 1 auto;
+        padding: 24px 16px;
+        min-height: 250px;
+        order: 1;
+      }
+
+      .illustration img {
+        max-width: 300px;
+        width: 80%;
+      }
+
+      .form-box {
+        flex: 1;
+        padding: 24px;
+        min-height: auto;
+        order: 2;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .input-group {
+        margin-bottom: 11px;
+      }
+
+      .input-group input {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .toggle {
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .role-select {
+        gap: 8px;
+        margin-bottom: 10px;
+        font-size: 12px;
+      }
+
+      .role-select input {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html {
+        font-size: 14px;
+      }
+
+      body {
+        padding: 12px;
+      }
+
+      .container {
+        border-radius: 12px;
+        flex-direction: column;
+      }
+
+      .brand-corner {
+        left: 14px;
+        top: 12px;
+        font-size: 0.75rem;
+        padding: 4px 6px;
+      }
+
+      .illustration {
+        flex: 0 1 auto;
+        padding: 20px 14px;
+        min-height: 200px;
+        order: 1;
+      }
+
+      .illustration img {
+        max-width: 280px;
+      }
+
+      .form-box {
+        padding: 20px;
+        order: 2;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        margin-bottom: 10px;
+      }
+
+      .input-group input {
+        padding: 9px;
+        font-size: 13px;
+      }
+
+      .btn {
+        padding: 9px;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .toggle {
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+
+      .role-select {
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 11px;
+      }
+
+      .role-select label {
+        gap: 4px;
+      }
+
+      .role-select input {
+        width: 15px;
+        height: 15px;
+      }
+
+      .message {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      html {
+        font-size: 13px;
+      }
+
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        flex-direction: column;
+        border-radius: 10px;
+      }
+
+      .brand-corner {
+        left: 10px;
+        top: 10px;
+        font-size: 0.7rem;
+        padding: 3px 5px;
+      }
+
+      .illustration {
+        padding: 16px 12px;
+        min-height: 180px;
+        order: 1;
+      }
+
+      .illustration img {
+        max-width: 250px;
+        width: 70%;
+      }
+
+      .form-box {
+        padding: 16px;
+        order: 2;
+      }
+
+      h2 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 11px;
+        margin-bottom: 8px;
+      }
+
+      .input-group {
+        margin-bottom: 9px;
+      }
+
+      .input-group input {
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .btn {
+        padding: 8px 10px;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .toggle {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+
+      .role-select {
+        gap: 6px;
+        margin-bottom: 8px;
+        font-size: 10px;
+      }
+
+      .role-select label {
+        gap: 4px;
+      }
+
+      .role-select input {
+        width: 14px;
+        height: 14px;
+      }
+
+      .message {
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      html {
+        font-size: 12px;
+      }
+
+      body {
+        padding: 8px;
+      }
+
+      .container {
+        border-radius: 8px;
+        flex-direction: column;
+      }
+
+      .brand-corner {
+        left: 8px;
+        top: 8px;
+        font-size: 0.65rem;
+        padding: 2px 4px;
+      }
+
+      .illustration {
+        padding: 12px 10px;
+        min-height: 150px;
+        order: 1;
+      }
+
+      .illustration img {
+        max-width: 220px;
+        width: 60%;
+      }
+
+      .form-box {
+        padding: 14px;
+        order: 2;
+      }
+
+      h2 {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+
+      .input-group {
+        margin-bottom: 8px;
+      }
+
+      .input-group input {
+        padding: 7px;
+        font-size: 11px;
+      }
+
+      .btn {
+        padding: 7px 8px;
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+
+      .toggle {
+        font-size: 9px;
+        margin-bottom: 5px;
+      }
+
+      .role-select {
+        gap: 6px;
+        margin-bottom: 6px;
+        font-size: 9px;
+      }
+
+      .role-select label {
+        gap: 3px;
+      }
+
+      .role-select input {
+        width: 13px;
+        height: 13px;
+      }
+
+      .message {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
@@ -159,19 +665,50 @@
     <!-- Forms -->
     <div class="form-box">
       <!-- Login Form -->
-      <form id="loginForm">
-        <h2>Welcome Back!</h2>
-        <div id="loginMsg" class="message"></div>
-        <div class="input-group">
-          <input type="email" id="loginEmail" placeholder="Email Address" required />
-        </div>
-        <div class="input-group">
-          <input type="password" id="loginPassword" placeholder="Password" required />
-        </div>
-        <button type="submit" class="btn">Login</button>
-        <p class="toggle"><a id="showForgot">Forgot Password?</a></p>
-        <p class="toggle">Don't have an account? <a id="showRegister">Sign Up</a></p>
-      </form>
+      
+      <form id="loginForm" autocomplete="off">
+
+  <!-- Hidden fake fields (important trick) -->
+  <input type="text" name="fakeuser" style="display:none">
+  <input type="password" name="fakepass" style="display:none">
+
+  <h2>Welcome Back!</h2>
+
+  <div class="role-select">
+    <label><input type="radio" name="role" value="user" checked /> Login as User</label>
+    <label><input type="radio" name="role" value="admin" /> Login as Admin</label>
+  </div>
+
+  <div id="loginMsg" class="message"></div>
+
+  <div class="input-group">
+    <input 
+      type="email" 
+      id="loginEmail" 
+      name="login_random_email"
+      autocomplete="new-email"
+      placeholder="Email Address" 
+      required 
+    />
+  </div>
+
+  <div class="input-group">
+    <input 
+      type="password" 
+      id="loginPassword" 
+      name="login_random_password"
+      autocomplete="new-password"
+      placeholder="Password" 
+      required 
+    />
+  </div>
+
+  <button type="submit" class="btn">Login</button>
+
+  <p class="toggle"><a id="showForgot">Forgot Password?</a></p>
+  <p class="toggle">Don't have an account? <a id="showRegister">Sign Up</a></p>
+
+</form>
 
       <!-- Register Form -->
       <form id="registerForm" class="hidden">

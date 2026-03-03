@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management | SaffronSky</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body>
+    <div class="product-container">
+        <header class="product-header">
+            <div class="brand-logo">SeffronSky</div>
+            <h2>Product</h2>
+            <div class="action-group">
+                <a class="back-btn" href="index.html" aria-label="Back to dashboard">Back</a>
+                <button class="add-btn" onclick="window.location.href='add-product.html'">+ Add Product</button>
+            </div>
+        </header>
+
+        <div class="table-card">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Status</th>
+                        <th>Product ID</th>
+                        <th>Food Details</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/admin-logic.js"></script>
+</body>
+</html>

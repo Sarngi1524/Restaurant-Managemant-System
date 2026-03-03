@@ -18,84 +18,284 @@
   </div>
   <style>
     * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
-}
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
+    }
 
-body, html {
-  height: 100%;
-  width: 100%;
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
 
-}
+    .order {
+      background: url("assets/food background.jpg") no-repeat center center/cover;
+      background-attachment: fixed;
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+      padding: 20px;
+    }
 
-.order {
-  background: url("assets/food background.jpg") no-repeat center center/cover;
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-}
-/* brand corner */
-.brand-corner{
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  background: rgba(255,255,255,0.9);
-  color: #ff6600;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-weight:700;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  z-index: 50;
-  font-size:0.95rem;
-}
-/* responsive tweaks for brand label (order anchored left) */
-@media (max-width:900px) {
-  .brand-corner{ left: 14px; top: 12px; font-size:0.9rem; padding:5px 8px; }
-}
-@media (max-width:480px) {
-  .brand-corner{ left: 10px; top: 8px; font-size:0.85rem; padding:4px 7px; }
-}
+    .brand-corner {
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #ff6600;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      z-index: 50;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
 
-.splash-content {
-  text-align: center;
-  background: rgba(255, 167, 108, 0.5);
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0px 4px 20px rgba(0,0,0,0.5);
-}
+    .overlay {
+      text-align: center;
+      background: transparent;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: none;
+      max-width: 900px;
+      width: 100%;
+    }
 
-.logo {
-  width: 650px;
-  margin-bottom: 30px;
-}
+    .logo {
+      width: 100%;
+      max-width: 650px;
+      margin: 0 auto 30px;
+      height: auto;
+      object-fit: contain;
+    }
 
-h1 {
-  color: #f88f49d8;
-  font-size: 50
-  0px;
-   display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  
-}
-h3 {
-  color: #f88f49d8;
-  font-size: 15px;
-   display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
+    h1 {
+      color: #f88f49d8;
+      font-size: 50px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      line-height: 1.3;
+      word-wrap: break-word;
+    }
+
+    h3 {
+      color: #f88f49d8;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.4;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .order {
+        padding: 18px;
+      }
+
+      .brand-corner {
+        left: 22px;
+        top: 22px;
+        font-size: 0.9rem;
+      }
+
+      .overlay {
+        padding: 36px;
+      }
+
+      .logo {
+        max-width: 600px;
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        font-size: 46px;
+        margin-bottom: 12px;
+      }
+
+      h3 {
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .order {
+        padding: 16px;
+      }
+
+      .brand-corner {
+        left: 20px;
+        top: 20px;
+        font-size: 0.88rem;
+        padding: 5px 8px;
+      }
+
+      .overlay {
+        padding: 32px;
+      }
+
+      .logo {
+        max-width: 550px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        font-size: 42px;
+        margin-bottom: 11px;
+      }
+
+      h3 {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .order {
+        padding: 14px;
+      }
+
+      .brand-corner {
+        left: 16px;
+        top: 16px;
+        font-size: 0.85rem;
+        padding: 5px 8px;
+      }
+
+      .overlay {
+        padding: 28px;
+        border-radius: 12px;
+      }
+
+      .logo {
+        max-width: 480px;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: 38px;
+        margin-bottom: 10px;
+      }
+
+      h3 {
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html {
+        font-size: 14px;
+      }
+
+      .order {
+        padding: 12px;
+      }
+
+      .brand-corner {
+        left: 14px;
+        top: 14px;
+        font-size: 0.75rem;
+        padding: 4px 6px;
+      }
+
+      .overlay {
+        padding: 24px;
+        border-radius: 12px;
+      }
+
+      .logo {
+        max-width: 400px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 8px;
+      }
+
+      h3 {
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      html {
+        font-size: 13px;
+      }
+
+      .order {
+        padding: 10px;
+      }
+
+      .brand-corner {
+        left: 10px;
+        top: 10px;
+        font-size: 0.8rem;
+        padding: 3px 6px;
+      }
+
+      .overlay {
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      .logo {
+        max-width: 300px;
+        width: 90%;
+        margin: 0 auto 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+
+      h3 {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      html {
+        font-size: 12px;
+      }
+
+      .order {
+        padding: 8px;
+      }
+
+      .brand-corner {
+        left: 8px;
+        top: 8px;
+        font-size: 0.7rem;
+        padding: 2px 4px;
+      }
+
+      .overlay {
+        padding: 16px;
+        border-radius: 8px;
+      }
+
+      .logo {
+        max-width: 250px;
+        width: 85%;
+        margin: 0 auto 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+        margin-bottom: 6px;
+      }
+
+      h3 {
+        font-size: 9px;
+      }
+    }
   </style>
 
   <script>// When user clicks anywhere on the splash screen, go to login.html
@@ -103,6 +303,7 @@ document.getElementById("splashScreen").addEventListener("click", function() {
  
     window.location.href = "feedback.html";
 });
+
 </script>
 </body>
 </html>

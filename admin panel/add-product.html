@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product | SaffronSky</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+</head>
+<body>
+    <div class="add-product-container">
+        <header class="form-header">
+            <div class="brand-logo" style="margin-right:20px;">SeffronSky</div>
+            <button class="back-btn" onclick="window.location.href='product.html'">Back</button>
+            <h2>Add Product</h2>
+        </header>
+
+        <form id="addProductForm" class="product-form-card">
+            <div class="upload-section">
+                <div class="upload-box" id="uploadBox">
+                    <input type="file" id="imageInput" hidden accept="image/*">
+                    <div class="upload-content">
+                        <span class="upload-icon">+</span>
+                        <p>Upload Image</p>
+                    </div>
+                    <img id="imagePreview" src="" style="display:none;" class="preview-img">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>Product Name :</label>
+                    <input type="text" id="productName" placeholder="Product Name" required>
+                </div>
+                <div class="input-group">
+                    <label>Details of Food :</label>
+                    <textarea id="details" placeholder="Describe the dish, ingredients, or portion size" rows="3" required></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Category :</label>
+                    <select id="category" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="Foodie">Foodie</option>
+                        <option value="Cold Drink">Cold Drink</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Price :</label>
+                    <input type="number" id="price" placeholder="Enter Price" required>
+                </div>
+                <div class="input-group">
+                    <label>Status :</label>
+                    <select id="status">
+                        <option value="In Stock">In Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="save-btn">Save Product</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="js/admin-logic.js"></script>
+</body>
+</html>

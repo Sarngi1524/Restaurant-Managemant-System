@@ -12,8 +12,8 @@
       --bg: #fffafc;
       --card: #fff;
       --muted: #666;
-      --accent: #ff6600; /* baby-pink accent */
-      --accent-dark:#ff6600;
+      --accent: #ff6600;
+      --accent-dark: #ff6600;
       --radius: 12px;
       --gap: 16px;
     }
@@ -21,10 +21,13 @@
     html, body {
       height: 100%;
       margin: 0;
-      background:url('assets/food background.jpg') no-repeat center center/cover;
+      background: url('assets/food background.jpg') no-repeat center center/cover;
       color: #222;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     /* Make feedback form full-screen and center content */
@@ -34,42 +37,46 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
-      background:url('assets/food background.jpg') no-repeat center center/cover;
+      padding: 24px;
     }
 
     .feedback-container {
       width: 100%;
       max-width: 960px;
-      margin: 0 auto;
-      background: rgba(255,255,255,0.92);
+      margin: auto;
+      background: rgba(255, 255, 255, 0.92);
       border-radius: 12px;
-      box-shadow: 0 6px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.35);
       padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 18px;
       align-self: center;
-      height: calc(100vh - 48px); /* leave a little breathing room */
+      min-height: auto;
+      position: relative;
     }
-    /* brand corner */
-    .feedback-container { position: relative; }
-    .brand-corner{
+
+    .brand-corner {
       position: absolute;
-      left: 12px;
-      top: 12px;
+      left: 24px;
+      top: 24px;
       color: var(--accent-dark);
       padding: 6px 10px;
       border-radius: 6px;
-      font:weight 10px;
       z-index: 50;
-      font-size:0.9rem;
+      font-size: 0.9rem;
+      font-weight: 700;
       font-family: "Brush Script MT", "Lucida Handwriting", "Apple Chancery", "Comic Sans MS", cursive;
+      transition: all 0.3s ease;
     }
 
     h1 {
       margin: 0;
       text-align: center;
       color: var(--accent-dark);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     form {
@@ -91,25 +98,62 @@
       font-size: 15px;
       background: #fff;
       color: inherit;
+      transition: border-color 0.3s ease;
     }
 
-  textarea { height: auto; resize: none; flex: 1 1 auto; min-height: 140px; }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent-dark);
+      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+    }
 
-    label { font-weight: 600; color: var(--muted); }
+    textarea {
+      height: auto;
+      resize: none;
+      flex: 1 1 auto;
+      min-height: 140px;
+      font-family: inherit;
+    }
 
-    .rating { display:flex; gap:10px; align-items:center; }
+    label {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
 
-    .stars { display:flex; gap:8px; cursor:pointer; }
+    .rating {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stars {
+      display: flex;
+      gap: 8px;
+      cursor: pointer;
+    }
 
     .star {
-       font-size: 22px;
-       color: #ffa76c7c;
-       transition: color 0.15s; 
-      }
-    .star.selected { color: var(--accent); }
+      font-size: 22px;
+      color: #ccc;
+      transition: color 0.15s;
+      cursor: pointer;
+    }
 
-    .controls { display:flex; gap:12px; }
-    .controls button { flex:1; }
+    .star.selected,
+    .star:hover {
+      color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .controls button {
+      flex: 1;
+    }
 
     button {
       padding: 12px 14px;
@@ -119,31 +163,413 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s ease;
+      font-weight: 600;
+      white-space: nowrap;
     }
-    button:hover { background: var(--accent-dark); }
 
-  .view-feedback { background: #ff6600; }
-
-  /* Make submit and view buttons sit on same row at bottom when there's space */
-  .controls { display:flex; gap:12px; margin-top: 6px; }
-  .controls button { flex:1; }
-
-    .feedback-list { margin-top: 8px; background: var(--card); padding: 12px; border-radius: 8px; max-height: 260px; overflow-y:auto; }
-    .feedback-item { border-bottom: 1px solid #ffffff; padding: 10px 0; }
-    .feedback-item:last-child { border-bottom: none; }
-
-    /* Responsive tweaks */
-    @media (max-width: 640px) {
-      body { padding: 18px; }
-      .feedback-container { padding: 18px; }
-      .controls { flex-direction: column; }
+    button:hover {
+      background: var(--accent-dark);
     }
-    /* responsive tweaks for brand label (feedback anchored left) */
-    @media (max-width:900px) {
-      .brand-corner{ left: 16px; top: 14px; font-size:0.85rem; padding:5px 8px; }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
     }
-    @media (max-width:480px) {
-      .brand-corner{ left: 12px; top: 10px; font-size:0.8rem; padding:4px 7px; }
+
+    .view-feedback {
+      background: #ff6600;
+    }
+
+    .feedback-list {
+      margin-top: 8px;
+      background: var(--card);
+      padding: 12px;
+      border-radius: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+
+    .feedback-item {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 10px 0;
+    }
+
+    .feedback-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .feedback-container {
+        padding: 22px;
+      }
+
+      .brand-corner {
+        left: 22px;
+        top: 22px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      input, textarea, select {
+        padding: 11px;
+        font-size: 14px;
+      }
+
+      .star {
+        font-size: 20px;
+      }
+
+      button {
+        padding: 11px 12px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .feedback-container {
+        padding: 20px;
+      }
+
+      .brand-corner {
+        left: 20px;
+        top: 20px;
+        font-size: 0.85rem;
+        padding: 5px 8px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      form {
+        gap: 10px;
+        padding: 10px;
+      }
+
+      input, textarea, select {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      label {
+        font-size: 0.9rem;
+      }
+
+      .star {
+        font-size: 20px;
+      }
+
+      button {
+        padding: 10px 10px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      .feedback-container {
+        padding: 18px;
+        gap: 14px;
+      }
+
+      .brand-corner {
+        left: 16px;
+        top: 14px;
+        font-size: 0.8rem;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+      }
+
+      form {
+        gap: 9px;
+        padding: 8px;
+      }
+
+      input, textarea, select {
+        padding: 10px;
+        font-size: 14px;
+      }
+
+      textarea {
+        min-height: 120px;
+      }
+
+      label {
+        font-size: 0.85rem;
+        margin-top: 2px;
+      }
+
+      .star {
+        font-size: 18px;
+      }
+
+      .rating {
+        gap: 6px;
+      }
+
+      .stars {
+        gap: 6px;
+      }
+
+      .controls {
+        gap: 10px;
+        flex-direction: column;
+      }
+
+      .controls button {
+        flex: 1;
+      }
+
+      button {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .feedback-list {
+        padding: 10px;
+        max-height: 200px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      html {
+        font-size: 14px;
+      }
+
+      body {
+        padding: 12px;
+      }
+
+      .feedback-container {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .brand-corner {
+        left: 14px;
+        top: 12px;
+        font-size: 0.75rem;
+        padding: 4px 6px;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+      }
+
+      form {
+        gap: 8px;
+        padding: 6px;
+      }
+
+      input, textarea, select {
+        padding: 9px;
+        font-size: 13px;
+      }
+
+      textarea {
+        min-height: 100px;
+      }
+
+      label {
+        font-size: 0.8rem;
+      }
+
+      .star {
+        font-size: 18px;
+      }
+
+      .rating {
+        gap: 6px;
+      }
+
+      .stars {
+        gap: 5px;
+      }
+
+      button {
+        padding: 9px;
+        font-size: 12px;
+      }
+
+      .controls {
+        margin-top: 2px;
+      }
+
+      .feedback-list {
+        padding: 9px;
+        max-height: 180px;
+        font-size: 0.8rem;
+      }
+
+      .feedback-item {
+        padding: 8px 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      html {
+        font-size: 13px;
+      }
+
+      body {
+        padding: 10px;
+      }
+
+      .feedback-container {
+        padding: 14px;
+        gap: 10px;
+        border-radius: 10px;
+      }
+
+      .brand-corner {
+        left: 10px;
+        top: 10px;
+        font-size: 0.7rem;
+        padding: 3px 5px;
+      }
+
+      h1 {
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+      }
+
+      form {
+        gap: 7px;
+        padding: 4px;
+      }
+
+      input, textarea, select {
+        padding: 8px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      textarea {
+        min-height: 90px;
+      }
+
+      label {
+        font-size: 0.75rem;
+        margin-top: 2px;
+      }
+
+      .star {
+        font-size: 16px;
+      }
+
+      .rating {
+        gap: 6px;
+      }
+
+      .stars {
+        gap: 4px;
+      }
+
+      button {
+        padding: 8px 10px;
+        font-size: 12px;
+        border-radius: 8px;
+      }
+
+      .controls {
+        margin-top: 2px;
+      }
+
+      .feedback-list {
+        padding: 8px;
+        max-height: 150px;
+        font-size: 0.75rem;
+      }
+
+      .feedback-item {
+        padding: 6px 0;
+      }
+    }
+
+    @media (max-width: 360px) {
+      html {
+        font-size: 12px;
+      }
+
+      body {
+        padding: 8px;
+      }
+
+      .feedback-container {
+        padding: 12px;
+        gap: 8px;
+        border-radius: 8px;
+      }
+
+      .brand-corner {
+        left: 8px;
+        top: 8px;
+        font-size: 0.65rem;
+        padding: 2px 4px;
+      }
+
+      h1 {
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+
+      form {
+        gap: 6px;
+        padding: 2px;
+      }
+
+      input, textarea, select {
+        padding: 7px;
+        font-size: 12px;
+      }
+
+      textarea {
+        min-height: 80px;
+      }
+
+      label {
+        font-size: 0.7rem;
+        margin-top: 1px;
+      }
+
+      .star {
+        font-size: 16px;
+      }
+
+      .rating {
+        gap: 4px;
+      }
+
+      .stars {
+        gap: 4px;
+      }
+
+      button {
+        padding: 7px 8px;
+        font-size: 11px;
+      }
+
+      .feedback-list {
+        padding: 6px;
+        max-height: 120px;
+        font-size: 0.7rem;
+      }
+
+      .feedback-item {
+        padding: 5px 0;
+      }
     }
   </style>
 </head>
@@ -190,60 +616,80 @@
 
   <script>
     let foodRating = 0;
-    const stars = document.querySelectorAll("#foodStars .star");
-    const form = document.getElementById("feedbackForm");
-    const feedbackListDiv = document.getElementById("feedbackList");
+const stars = document.querySelectorAll("#foodStars .star");
+const form = document.getElementById("feedbackForm");
+const feedbackListDiv = document.getElementById("feedbackList");
 
-    // Handle food rating selection
-    stars.forEach(star => {
-      star.addEventListener("click", () => {
-        foodRating = parseInt(star.getAttribute("data-value"));
-        stars.forEach(s => s.classList.remove("selected"));
-        for (let i = 0; i < foodRating; i++) {
-          stars[i].classList.add("selected");
-        }
-      });
-    });
+// 1. Handle food rating selection (Stars UI)
+stars.forEach(star => {
+  star.addEventListener("click", () => {
+    foodRating = parseInt(star.getAttribute("data-value"));
+    stars.forEach(s => s.classList.remove("selected"));
+    for (let i = 0; i < foodRating; i++) {
+      stars[i].classList.add("selected");
+    }
+  });
+});
 
-    // Submit feedback
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const serviceRating = document.getElementById("serviceRating").value;
-      const comments = document.getElementById("comments").value;
+// 2. Submit feedback to MySQL Database
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  
+  const feedback = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    foodRating: foodRating,
+    serviceRating: document.getElementById("serviceRating").value,
+    comments: document.getElementById("comments").value
+  };
 
-      if (foodRating === 0) {
-        alert("Please rate the food!");
-        return;
-      }
+  if (foodRating === 0) {
+    alert("Please rate the food!");
+    return;
+  }
 
-      const feedback = {
-        name,
-        email,
-        foodRating,
-        serviceRating,
-        comments,
-        date: new Date().toLocaleString()
-      };
+  // Primary database save
+  fetch("/api/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(feedback)
+  })
+  .then(res => res.json())
+  .then(() => {
+    alert("Thank you for your feedback!");
+    form.reset();
+    stars.forEach(s => s.classList.remove("selected"));
+    foodRating = 0;
 
-      const feedbackList = JSON.parse(localStorage.getItem("feedback")) || [];
-      feedbackList.push(feedback);
-      localStorage.setItem("feedback", JSON.stringify(feedbackList));
+    // if we stored a booking id earlier, remove that booking as well
+    const lastId = localStorage.getItem('lastBookingId');
+    if (lastId) {
+      fetch(`/api/cancel-booking/${lastId}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .finally(() => {
+          localStorage.removeItem('lastBookingId');
+        });
+    }
 
-      // clear form and redirect to login
-      form.reset();
-      stars.forEach(s => s.classList.remove("selected"));
-      foodRating = 0;
-      // short pause so user sees the cleared form, then redirect
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 300);
-    });
+    // clear any cached booking data since the booking was deleted on the server
+    localStorage.removeItem('bookings');
+    // redirect to login page
+    setTimeout(() => { window.location.href = 'login.html'; }, 300);
+  })
+  .catch((err) => {
+    console.error("Database Save Error:", err);
+    alert("Could not save feedback. Please check your server connection.");
+  });
+});
 
-    // View feedback
-    document.getElementById("viewBtn").addEventListener("click", () => {
-      const feedbackList = JSON.parse(localStorage.getItem("feedback")) || [];
+// 3. View All Feedback from MySQL (Replaces localStorage logic)
+document.getElementById("viewBtn").addEventListener("click", () => {
+  // Fetch the latest data from the central database
+  fetch("/api/data")
+    .then(res => res.json())
+    .then(data => {
+      const feedbackList = data.feedback || [];
+      
       if (feedbackList.length === 0) {
         alert("No feedback submitted yet!");
         return;
@@ -256,14 +702,18 @@
         const div = document.createElement("div");
         div.classList.add("feedback-item");
         div.innerHTML = `
-          <strong>${fb.name}</strong> (${fb.email})<br>
-          ⭐ Food: ${fb.foodRating}/5 | 💬 Service: ${fb.serviceRating}<br>
-          <em>${fb.comments}</em><br>
-          <small>${fb.date}</small>
+          <strong>${fb.name ?? "-"}</strong> (${fb.email ?? "-"})<br>
+          ⭐ Food: ${fb.foodRating ?? "-"}/5 | 💬 Service: ${fb.serviceRating ?? "-"}<br>
+          <em>${fb.comments ?? fb.comment ?? "-"}</em>
         `;
         feedbackListDiv.appendChild(div);
       });
+    })
+    .catch(err => {
+      console.error("Fetch Error:", err);
+      alert("Unable to load feedback from server.");
     });
+});
   </script>
 </body>
 </html>

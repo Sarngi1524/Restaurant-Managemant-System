@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard | SaffronSky</title>
+    <link rel="stylesheet" href="css/admin-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <header class="dashboard-header">
+            <div class="brand-logo">SeffronSky</div>
+            <div class="button-group">
+                <a class="dashboard-btn nav-btn" href="index.html">Manager Dashboard</a>
+                <nav class="admin-nav" aria-label="Admin navigation">
+                    <a class="nav-btn" href="product.html">Products</a>
+                    <a class="nav-btn" href="profile.html">Profile</a>
+                    <button class="nav-btn logout-btn" onclick="handleLogout()">Logout</button>
+                </nav>
+            </div>
+        </header>
+
+        <div class="top-row">
+            <div class="chart-card income-source">
+                <h3>Total Income</h3>
+                <div class="chart-container">
+                    <canvas id="incomeDoughnut"></canvas>
+                    <div class="center-text">
+                        <div class="center-symbol">💰</div>
+                        <div>₹20,000</div>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <span><div class="dot foodies"></div> Foodies</span>
+                    <span><div class="dot drinks"></div> Cold Drink</span>
+                    <span><div class="dot others"></div> Others</span>
+                </div>
+            </div>
+
+            <div class="chart-card balance-card">
+                <h3>Total Balance</h3>
+                <h1 class="balance-amount">₹30,000</h1>
+                <div class="balance-stats">
+                    <div class="stat-item">
+                        <div class="icon-box income">💵</div>
+                        <div>
+                            <p>Total Income</p>
+                            <strong>₹4,500</strong> <span class="trend up">(+ 20% Increase)</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="icon-box expense">💸</div>
+                        <div>
+                            <p>Total Expense</p>
+                            <strong>₹2,500</strong> <span class="trend up">(+ 30% Increase)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-row">
+            <div class="chart-card daily-selling">
+                <h3>Daily Selling</h3>
+                <canvas id="sellingLineChart"></canvas>
+            </div>
+
+            <div class="chart-card best-dishes">
+                <h3>Best Dishes</h3>
+                <div class="dishes-list" id="bestDishesList">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-logic.js"></script>
+</body>
+</html>
