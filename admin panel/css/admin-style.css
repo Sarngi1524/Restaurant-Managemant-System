@@ -233,18 +233,18 @@ body::before {
 
 .dot.drinks {
     background-color: #A8D8FF;
-     margin-left: 120px;
+    margin-left: 120px;
 }
 
 .dot.others {
     background-color: #D3D3D3;
-     margin-left: 120px
+    margin-left: 120px
 }
 
 .center-text {
     position: absolute;
     top: 50%;
-    left: 18%;
+    left: 19%;
     transform: translate(-50%, -50%);
     font-weight: bold;
     font-size: 1.2rem;
@@ -327,7 +327,6 @@ body::before {
 
 /* group containing back arrow, add product buttons */
 .action-group {
-   
     display: flex;
     align-items: center;
     gap: 10px;
@@ -629,6 +628,18 @@ body::before {
     font-size: 0.9rem;
 }
 
+.billing-items-cell {
+    min-width: 240px;
+    white-space: normal;
+}
+
+.billing-item-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 2px 0;
+}
+
 .db-table tbody tr:hover {
     background-color: #f9f9f9;
 }
@@ -721,7 +732,7 @@ table {
         height: 200px;
         left: 20%;
     }
-     .center-text {
+    .center-text {
         font-size: 0.9rem;
         top: 45%;
         left: 18%;

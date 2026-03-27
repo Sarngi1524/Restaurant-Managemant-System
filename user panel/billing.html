@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Billing - Order Payment</title>
-  <style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Billing - Order Payment</title>
+    <style>
     :root{
         --bg:#fff4f6;
         --accent:#ff6600;
@@ -46,7 +46,7 @@
     /* brand corner label */
     .brand-corner{
       position: absolute;
-      left: 28px;
+      right: 28px;
       top: 20px;
       color: var(--accent);
       padding: 6px 10px;
@@ -246,7 +246,7 @@
         }
 
         .brand-corner {
-            left: 24px;
+            right: 24px;
             top: 16px;
         }
 
@@ -279,7 +279,7 @@
         }
 
         .brand-corner {
-            left: 20px;
+            right: 20px;
             top: 14px;
             font-size: 0.85rem;
         }
@@ -321,7 +321,7 @@
         }
 
         .brand-corner {
-            left: 16px;
+            right: 16px;
             top: 12px;
             font-size: 0.8rem;
             padding: 5px 8px;
@@ -387,7 +387,7 @@
         }
 
         .brand-corner {
-            left: 12px;
+            right: 12px;
             top: 10px;
             font-size: 0.75rem;
             padding: 4px 6px;
@@ -475,7 +475,7 @@
         }
 
         .brand-corner {
-            left: 8px;
+            right: 8px;
             top: 8px;
             font-size: 0.7rem;
             padding: 3px 5px;
@@ -570,7 +570,7 @@
         }
 
         .brand-corner {
-            left: 6px;
+            right: 6px;
             top: 6px;
             font-size: 0.65rem;
             padding: 2px 4px;
@@ -739,7 +739,13 @@
                 items: (order.items || []).map(it => ({ productId: it.id, name: it.name, price: it.price, qty: it.qty }))
             })
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || `HTTP ${res.status}`);
+            }
+            return data;
+        })
         .then(data => {
             payMsg.textContent = 'Payment successful. Order saved!';
 

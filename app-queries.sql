@@ -86,14 +86,15 @@ GROUP BY DATE(created_at)
 ORDER BY DATE(created_at) DESC;
 
 -- name: ADMIN_STATS_BEST_DISHES
-SELECT p.id as product_id, p.name, p.category, p.image_url,
-       COALESCE(SUM(oi.qty),0) AS qtySold,
-       COALESCE(SUM(oi.qty * oi.price),0) AS revenue,
+SELECT p.id as product_id, p.name, p.category, p.image_url, p.price AS current_price,
+       COALESCE(SUM(CASE WHEN o.status = 'Paid' THEN oi.qty ELSE 0 END),0) AS qtySold,
+       COALESCE(SUM(CASE WHEN o.status = 'Paid' THEN oi.qty * oi.price ELSE 0 END),0) AS revenue,
        p.created_at
 FROM products p
 LEFT JOIN order_items oi ON oi.product_id = p.id
-GROUP BY p.id, p.name, p.category, p.image_url, p.created_at
-ORDER BY revenue DESC, p.created_at DESC;
+LEFT JOIN orders o ON o.id = oi.order_id
+GROUP BY p.id, p.name, p.category, p.image_url, p.price, p.created_at
+ORDER BY qtySold DESC, revenue DESC, p.created_at DESC;
 
 -- name: ADMIN_STATS_USER_COUNT
 SELECT COUNT(*) as userCount FROM users;
@@ -110,7 +111,8 @@ LIMIT 4;
 SELECT COALESCE(p.category, 'Unknown') as category, SUM(oi.qty * oi.price) AS revenue
 FROM order_items oi
 INNER JOIN products p ON oi.product_id = p.id
-WHERE p.category IS NOT NULL
+INNER JOIN orders o ON o.id = oi.order_id
+WHERE p.category IS NOT NULL AND o.status = 'Paid'
 GROUP BY p.category
 ORDER BY revenue DESC;
 

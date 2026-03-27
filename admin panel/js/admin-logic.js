@@ -54,6 +54,9 @@ function normalizeImageSrc(src) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    let isStatsFetchInFlight = false;
+    let statsRefreshHandle = null;
+
     function formatDateLabel(input) {
         if (!input) return '';
         const parsed = new Date(input);
@@ -62,6 +65,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const isoDate = text.match(/\d{4}-\d{2}-\d{2}/);
         if (isoDate) return isoDate[0];
         return text.split(' ')[0];
+    }
+
+    function renderBestDishes(best) {
+        const list = document.getElementById('bestDishesList');
+        if (!list) return;
+
+        if (!Array.isArray(best) || !best.length) {
+            list.innerHTML = '<div class="dish-item"><div class="dish-info"><div><strong>No sales yet</strong><br><span style="color:#888">Best dishes will appear after paid orders.</span></div></div></div>';
+            return;
+        }
+
+        list.innerHTML = best.map(d => {
+            const color = (d.category || '').toLowerCase() === 'foodie'
+                ? '#ff6b35'
+                : ((d.category || '').toLowerCase() === 'cold drink' ? '#3498db' : '#888');
+
+            return `
+                <div class="dish-item" style="border-left:4px solid ${color};">
+                    <div class="dish-info">
+                        <img src="${normalizeImageSrc(d.image || '/user/assets/default.jpg')}" class="dish-img">
+                        <div>
+                            <strong>${d.name}</strong><br>
+                            <span style="color: ${color}">₹${Number(d.price || 0).toFixed(2)} each</span>
+                            <div style="font-size:0.8rem;color:#888">₹${Number(d.revenue || 0).toFixed(2)} revenue</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right">
+                        <strong>${Number(d.qtySold || 0)} orders</strong>
+                        <div style="font-size:0.8rem;color:#888">(${d.category || '—'})</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     // 1. Doughnut Chart (will be updated from server stats) - guard if element missing
@@ -158,6 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch admin stats from server and update charts
     function fetchAndRenderStats() {
+        if (isStatsFetchInFlight) return;
+        isStatsFetchInFlight = true;
+
         fetch('/api/admin/stats')
             .then(res => {
                 if (!res.ok) throw new Error('Stats fetch failed');
@@ -225,55 +264,55 @@ document.addEventListener('DOMContentLoaded', function() {
                             name: b.name,
                             category: b.category,
                             image: b.image || b.image_url,
-                            price: b.price,
+                            price: Number(b.price || 0),
                             avgRating: b.avgRating || b.rating || b.avg_rating || 0,
                             ratingCount: b.ratingCount || b.rating_count || 0,
-                            qtySold: b.qtySold || 0,
-                            revenue: b.revenue || 0
+                            qtySold: Number(b.qtySold || 0),
+                            revenue: Number(b.revenue || 0)
                         }));
                     } else {
-                        best = products.slice(0, 4).map(p => ({ name: p.name, price: p.price, image: p.image_url || p.image, avgRating: p.rating || p.avg_rating || 0, ratingCount: p.rating_count || 0 }));
+                        best = products.slice(0, 4).map(p => ({
+                            name: p.name,
+                            price: Number(p.price || 0),
+                            image: p.image_url || p.image,
+                            avgRating: p.rating || p.avg_rating || 0,
+                            ratingCount: p.rating_count || 0,
+                            qtySold: 0,
+                            revenue: 0
+                        }));
                     }
 
                     // attach image/price when missing by looking up in products
                     best = best.map(b => {
-                        if ((!b.image || b.image === '') && products.length) {
+                        if (products.length) {
                             const found = products.find(pp => pp.name === b.name || String(pp.id) === String(b.id));
-                            if (found) { b.image = found.image_url || found.image; b.price = b.price || found.price; }
+                            if (found) {
+                                if (!b.image || b.image === '') b.image = found.image_url || found.image;
+                                if (!Number.isFinite(Number(b.price)) || Number(b.price) <= 0) b.price = Number(found.price || 0);
+                            }
                         }
                         return b;
                     });
 
-                    // update best-dishes list -- do NOT overwrite the income doughnut
-                    const list = document.getElementById('bestDishesList');
-                    if (list) {
-                        list.innerHTML = best.map(d => {
-                            const color = (d.category || '').toLowerCase() === 'foodie' ? '#ff6b35' : ((d.category || '').toLowerCase() === 'cold drink' ? '#3498db' : '#888');
-                            return `
-                            <div class="dish-item" style="border-left:4px solid ${color};">
-                                <div class="dish-info">
-                                    <img src="${normalizeImageSrc(d.image || '/user/assets/default.jpg')}" class="dish-img">
-                                    <div>
-                                        <strong>${d.name}</strong><br>
-                                        <span style="color: ${color}">₹${Number(d.revenue || 0).toFixed(2)}</span>
-                                    </div>
-                                </div>
-                                <div style="text-align:right">
-                                    <strong>${d.qtySold || 0} orders</strong>
-                                    <div style="font-size:0.8rem;color:#888">(${d.category || '—'})</div>
-                                </div>
-                            </div>
-                        `}).join('');
-                    }
+                    renderBestDishes(best);
                 })();
             })
             .catch(err => {
                 console.warn('Could not load admin stats:', err);
+            })
+            .finally(() => {
+                isStatsFetchInFlight = false;
             });
     }
 
     // initial fetch
     fetchAndRenderStats();
+    if (document.getElementById('bestDishesList')) {
+        statsRefreshHandle = window.setInterval(fetchAndRenderStats, 15000);
+        window.addEventListener('beforeunload', () => {
+            if (statsRefreshHandle) window.clearInterval(statsRefreshHandle);
+        }, { once: true });
+    }
 
     // Best dishes will be populated dynamically from server stats
 });
@@ -529,6 +568,10 @@ function switchTab(tabId) {
     
     document.getElementById(tabId).style.display = 'block';
     event.currentTarget.classList.add('active');
+
+    if (tabId === 'billingTab' || tabId === 'usersTab' || tabId === 'feedbackTab' || tabId === 'bookingsTab') {
+        fetchAllDatabaseData();
+    }
 }
 
 // Fetch all database records from MySQL via server.js
@@ -536,6 +579,13 @@ function fetchAllDatabaseData() {
     fetch("/api/data")
         .then(res => res.json())
         .then(data => {
+            const orders = [...(data.orders || [])].sort((a, b) => {
+                const aTime = new Date(a.created_at || 0).getTime();
+                const bTime = new Date(b.created_at || 0).getTime();
+                if (bTime !== aTime) return bTime - aTime;
+                return Number(b.id || 0) - Number(a.id || 0);
+            });
+
             // 1. Populate Users
             const userBody = document.getElementById("usersList");
             userBody.innerHTML = (data.users || []).map(u => `
@@ -576,16 +626,21 @@ function fetchAllDatabaseData() {
             // 4. Populate Billing (Orders with payments)
             const billingBody = document.getElementById("billingList");
             if (billingBody) {
-                billingBody.innerHTML = (data.orders || []).map(o => `
+                billingBody.innerHTML = orders.length ? orders.map(o => `
                     <tr>
                         <td>#${o.id}</td>
                         <td>${o.email || 'N/A'}</td>
-                        <td>${(o.items && o.items.length) ? o.items.map(i=>`${i.name} x${i.qty}`).join(', ') : '–'}</td>
+                        <td class="billing-items-cell">${(o.items && o.items.length) ? o.items.map(i => `
+                            <div class="billing-item-line">
+                                <span>${i.name || 'Item'}</span>
+                                <strong>x${Number(i.qty || 0)}</strong>
+                            </div>
+                        `).join('') : '–'}</td>
                         <td>₹${Number(o.total || 0).toFixed(2)}</td>
                         <td><span class="status-tag" style="background-color: ${o.status === 'Paid' ? '#2ecc71' : '#e74c3c'}">${o.status}</span></td>
                         <td>${o.created_at ? new Date(o.created_at).toLocaleString() : 'N/A'}</td>
                     </tr>
-                `).join('');
+                `).join('') : '<tr><td colspan="6" style="text-align:center;color:#999;">No billing records found yet.</td></tr>';
             }
         })
         .catch(err => console.error("Database error:", err));
@@ -594,6 +649,10 @@ function fetchAllDatabaseData() {
 // Load data when page opens
 if (document.getElementById("usersList")) {
     fetchAllDatabaseData();
+    const dbRefreshHandle = window.setInterval(fetchAllDatabaseData, 15000);
+    window.addEventListener('beforeunload', () => {
+        window.clearInterval(dbRefreshHandle);
+    }, { once: true });
 }
 
 // --- Offline sync: push locally-saved products to server when reachable ---

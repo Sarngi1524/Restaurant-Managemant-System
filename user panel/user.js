@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 }
   // Forgot Password (verify email -> store resetEmail and switch to reset)
- if (forgotForm) {
+if (forgotForm) {
   forgotForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -179,8 +179,7 @@ if (resetForm) {
       resetMsg.className = "message error";
       return;
     }
-
-    fetch("/api/reset-password", {
+fetch("/api/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, newPassword: newPass })

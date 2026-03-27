@@ -182,21 +182,64 @@ app.delete("/api/cancel-booking/:id", (req, res) => {
 
 /* ===== OTHER ROUTES ===== */
 app.post("/api/orders", (req, res) => {
-    // now accept an items array so we can track product-wise sales
     const { email, total, status, items } = req.body;
-    db.query(q("INSERT_ORDER"), [email, total, status], (err, result) => {
-        if (err) return res.status(500).json(err);
-        const orderId = result.insertId;
-        if (Array.isArray(items) && items.length) {
-            const rows = items.map(it => [orderId, it.productId || null, it.name || null, it.qty || 0, it.price || 0]);
-            db.query(q("INSERT_ORDER_ITEMS"), [rows], (err2) => {
-                if (err2) console.error('Failed to insert order_items', err2);
-                // return success regardless of item insert error; we already saved order
-                res.json({ success: true });
-            });
-        } else {
-            res.json({ success: true });
+    const normalizedTotal = Number(total || 0);
+    const normalizedStatus = status || "Paid";
+    const normalizedItems = Array.isArray(items)
+        ? items
+            .map(it => ({
+                productId: it && it.productId !== undefined && it.productId !== null ? Number(it.productId) : null,
+                name: it && it.name ? String(it.name) : null,
+                qty: Math.max(0, Number(it && it.qty ? it.qty : 0)),
+                price: Math.max(0, Number(it && it.price ? it.price : 0))
+            }))
+            .filter(it => it.name && it.qty > 0)
+        : [];
+
+    db.beginTransaction((txErr) => {
+        if (txErr) {
+            console.error('Failed to start order transaction', txErr);
+            return res.status(500).json({ success: false, message: 'Could not save order' });
         }
+
+        db.query(q("INSERT_ORDER"), [email, normalizedTotal, normalizedStatus], (err, result) => {
+            if (err) {
+                return db.rollback(() => {
+                    console.error('Failed to insert order', err);
+                    res.status(500).json({ success: false, message: 'Could not save order' });
+                });
+            }
+
+            const orderId = result.insertId;
+            const finishSuccess = () => {
+                db.commit((commitErr) => {
+                    if (commitErr) {
+                        return db.rollback(() => {
+                            console.error('Failed to commit order transaction', commitErr);
+                            res.status(500).json({ success: false, message: 'Could not finalize order' });
+                        });
+                    }
+
+                    res.json({ success: true, orderId });
+                });
+            };
+
+            if (!normalizedItems.length) {
+                return finishSuccess();
+            }
+
+            const rows = normalizedItems.map(it => [orderId, it.productId, it.name, it.qty, it.price]);
+            db.query(q("INSERT_ORDER_ITEMS"), [rows], (err2) => {
+                if (err2) {
+                    return db.rollback(() => {
+                        console.error('Failed to insert order_items', err2);
+                        res.status(500).json({ success: false, message: 'Could not save order items' });
+                    });
+                }
+
+                finishSuccess();
+            });
+        });
     });
 });
 
@@ -269,6 +312,7 @@ app.get("/api/admin/stats", (req, res) => {
                         name: b.name,
                         category: b.category,
                         image: normalizeImagePath(b.image_url),
+                        price: Number(b.current_price) || 0,
                         qtySold: Number(b.qtySold) || 0,
                         revenue: Number(b.revenue) || 0
                     }));
@@ -279,8 +323,6 @@ app.get("/api/admin/stats", (req, res) => {
                 // 4. Get General Counts
                 db.query(q("ADMIN_STATS_USER_COUNT"), (err, userCount) => {
                     dashboardData.totalUsers = userCount[0].userCount;
-                    
-                    // Send everything to the dashboard
                     // Also fetch top rated products to show as best dishes
                     db.query(q("ADMIN_STATS_TOP_RATED_PRODUCTS"), (err, best) => {
                         // calculate revenue by category (food-wise)

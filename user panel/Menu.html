@@ -86,12 +86,12 @@
 
     <!-- external script.js removed to avoid 404/MIME errors; the main script is embedded later in this file -->
     <script>
-  (function(){
+(function(){
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn !== "true") {
-      alert("Please login first.");
-      window.location.href = "index.html";
-      return;
+    alert("Please login first.");
+    window.location.href = "index.html";
+    return;
     }
     const _rawUser = localStorage.getItem('loggedUser');
     const user = (_rawUser && _rawUser !== 'undefined') ? JSON.parse(_rawUser) : {};
@@ -112,7 +112,7 @@
         } catch (e) {
             if (tableDisplay) tableDisplay.textContent = 'Table: -';
         }
-  })();
+})();
     </script>
 </body>
 </html>

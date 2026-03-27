@@ -13,7 +13,7 @@ It includes two panels:
 
 ### User Side
 - User registration and login
-- Role-based login (User/Admin)
+- Role-based login (User/Admin)   
 - Table booking and cancellation
 - Menu browsing with product ratings
 - Order placement and billing flow
